@@ -43,15 +43,6 @@ pipeline {
                 sh 'docker build -t dev-casheer-be-image:latest .'
                 echo 'Showing image results'
                 sh 'docker images'
-
-                echo 'Remove temp-container'
-                sh 'docker rm -f temp-container || true'
-                
-                // Copying and modifying .env file
-                sh 'docker run --name temp-container -d dev-casheer-be-image:latest sleep 1d'
-                sh 'docker cp .env.example temp-container:.env.example'
-                sh 'docker cp temp-container:.env.example .env'
-                sh 'docker rm -f temp-container'
             }
         }
         
@@ -59,7 +50,7 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name dev-casheer-be-container -p 3030:3030 --env-file .env dev-casheer-be-image:latest'
+                sh 'docker run -d --name dev-casheer-be-container -p 3030:3030 dev-casheer-be-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
             }
