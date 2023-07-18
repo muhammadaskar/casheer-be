@@ -50,7 +50,7 @@ pipeline {
                 // Copying and modifying .env file
                 sh 'docker run --name temp-container -d dev-casheer-be-image:latest sleep 1d'
                 sh 'docker cp .env.example temp-container:.env.example'
-                sh 'docker cp temp-container:.env .env'
+                sh 'docker cp temp-container:.env.example .env'
                 sh 'docker rm -f temp-container'
             }
         }
