@@ -49,6 +49,7 @@ pipeline {
                 
                 // Copying and modifying .env file
                 sh 'docker run --name temp-container -d dev-casheer-be-image:latest sleep 1d'
+                sh 'docker exec temp-container mkdir -p /app'
                 sh 'docker cp /app/.env.example temp-container:/app/.env.example'
                 sh 'docker exec temp-container cp /app/.env.example /app/.env'
                 sh "docker exec temp-container sed -i \"s/DB_HOST=.*/DB_HOST=${DB_HOST}/\" /app/.env"
