@@ -50,16 +50,16 @@ pipeline {
                 // Copying and modifying .env file
                 sh 'docker run --name temp-container -d dev-casheer-be-image:latest sleep 1d'
                 sh 'docker exec temp-container mkdir -p /app'
-                sh 'docker cp /app/.env.example temp-container:/app/.env.example'
-                sh 'docker exec temp-container cp /app/.env.example /app/.env'
-                sh "docker exec temp-container sed -i \"s/DB_HOST=.*/DB_HOST=${DB_HOST}/\" /app/.env"
-                sh "docker exec temp-container sed -i \"s/DB_PORT=.*/DB_PORT=${DB_PORT}/\" /app/.env"
-                sh "docker exec temp-container sed -i \"s/DB_USER=.*/DB_USER=${DB_USER}/\" /app/.env"
-                sh "docker exec temp-container sed -i \"s/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/\" /app/.env"
-                sh "docker exec temp-container sed -i \"s/DB_NAME=.*/DB_NAME=${DB_NAME}/\" /app/.env"
-                sh "docker exec temp-container sed -i \"s/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/\" /app/.env"
-                sh "docker exec temp-container sed -i \"s/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT}/\" /app/.env"
-                sh 'docker cp temp-container:/app/.env .env'
+                sh 'docker cp .env.example temp-container:.env.example'
+                sh 'docker exec temp-container cp .env.example .env'
+                sh "docker exec temp-container sed -i \"s/DB_HOST=.*/DB_HOST=${DB_HOST}/\" .env"
+                sh "docker exec temp-container sed -i \"s/DB_PORT=.*/DB_PORT=${DB_PORT}/\" .env"
+                sh "docker exec temp-container sed -i \"s/DB_USER=.*/DB_USER=${DB_USER}/\" .env"
+                sh "docker exec temp-container sed -i \"s/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/\" .env"
+                sh "docker exec temp-container sed -i \"s/DB_NAME=.*/DB_NAME=${DB_NAME}/\" .env"
+                sh "docker exec temp-container sed -i \"s/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/\" .env"
+                sh "docker exec temp-container sed -i \"s/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT}/\" .env"
+                sh 'docker cp temp-container:.env .env'
                 sh 'docker rm -f temp-container'
             }
         }
