@@ -7,9 +7,6 @@ WORKDIR /app
 # Copy the .env.example file to the container
 COPY .env.example .env
 
-# Rename the file from .env.example to .env
-RUN mv .env.example .env
-
 # Menyalin file go.mod dan go.sum ke working directory
 COPY go.mod go.sum ./
 
