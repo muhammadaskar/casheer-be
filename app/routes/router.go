@@ -28,5 +28,6 @@ func NewRouter(router *gin.Engine) {
 		})
 
 		api.POST("auth/register", userHandler.Register)
+		api.POST("auth/login", userHandler.Login)
 	}
 }

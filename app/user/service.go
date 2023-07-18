@@ -9,6 +9,7 @@ import (
 
 type Service interface {
 	Register(input RegisterInput) (User, error)
+	Login(input LoginInput) (User, error)
 	IsEmailAvailable(email string) (bool, error)
 	IsUsernameAvailable(username string) (bool, error)
 }
@@ -68,6 +69,31 @@ func (s *service) Register(input RegisterInput) (User, error) {
 	}
 
 	return newUser, nil
+}
+
+func (s *service) Login(input LoginInput) (User, error) {
+	username := input.Username
+	password := input.Password
+
+	user, err := s.repository.FindByUsername(username)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("No user found on that username")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return user, err
+	}
+
+	if user.IsActive != 0 {
+		return user, errors.New("Your account not active")
+	}
+
+	return user, nil
 }
 
 func (s *service) IsEmailAvailable(email string) (bool, error) {
