@@ -2,14 +2,19 @@ pipeline {
     agent any
     
     stages {
-        environment {
-            DB_HOST = credentials('DB_HOST')
-            DB_PORT = credentials('DB_PORT')
-            DB_USER = credentials('DB_USER')
-            DB_PASSWORD = credentials('DB_PASSWORD')
-            DB_NAME = credentials('DB_NAME')
-            SECRET_KEY = credentials('SECRET_KEY')
-            SERVER_PORT = credentials('SERVER_PORT')
+        stage('Set Environment Variables'){
+            environment {
+                DB_HOST = credentials('DB_HOST')
+                DB_PORT = credentials('DB_PORT')
+                DB_USER = credentials('DB_USER')
+                DB_PASSWORD = credentials('DB_PASSWORD')
+                DB_NAME = credentials('DB_NAME')
+                SECRET_KEY = credentials('SECRET_KEY')
+                SERVER_PORT = credentials('SERVER_PORT')
+            }
+            steps {
+                echo 'Environment variables set.'
+            }
         }
         
         stage('Pull Repositories') {
