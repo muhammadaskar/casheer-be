@@ -43,6 +43,9 @@ pipeline {
                 sh 'docker build -t dev-casheer-be-image:latest .'
                 echo 'Showing image results'
                 sh 'docker images'
+
+                echo 'Remove temp-container'
+                sh 'docker rm -f temp-container || true'
                 
                 // Copying and modifying .env file
                 sh 'docker run --name temp-container -d dev-casheer-be-image:latest sleep 1d'
