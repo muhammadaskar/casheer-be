@@ -34,7 +34,8 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 	newUser, err := h.userService.Register(input)
 	if err != nil {
-		response := helper.APIResponse(message, http.StatusUnprocessableEntity, "error", nil)
+		errMessage := gin.H{"errors": err.Error()}
+		response := helper.APIResponse(message, http.StatusUnprocessableEntity, "error", errMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
