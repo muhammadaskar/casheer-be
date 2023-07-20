@@ -6,6 +6,7 @@ type Repository interface {
 	Save(user User) (User, error)
 	FindByEmail(email string) (User, error)
 	FindByUsername(username string) (User, error)
+	FindById(ID int) (User, error)
 }
 
 type repository struct {
@@ -41,6 +42,17 @@ func (r *repository) FindByUsername(username string) (User, error) {
 	var user User
 
 	err := r.db.Where("username = ?", username).Find(&user).Error
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (r *repository) FindById(ID int) (User, error) {
+	var user User
+
+	err := r.db.Where("id = ?", ID).Find(&user).Error
 	if err != nil {
 		return user, err
 	}
