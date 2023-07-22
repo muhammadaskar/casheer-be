@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 
@@ -9,6 +10,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/muhammadaskar/casheer-be/app/routes"
 )
+
+type Config struct {
+	AllowOrigins []string `json:"ALLOW_ORIGINS"`
+}
 
 func main() {
 	err := godotenv.Load()
@@ -21,18 +26,22 @@ func main() {
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://38.47.69.131:3000", "http://127.0.0.1"}
+
+	var conf Config
+	allowOriginsString := os.Getenv("ALLOW_ORIGINS")
+	err = json.Unmarshal([]byte(allowOriginsString), &conf.AllowOrigins)
+	if err != nil {
+		log.Fatal("Error parsing ALLOW_ORIGINS:", err)
+		return
+	}
+
+	config.AllowOrigins = conf.AllowOrigins
 	config.AddAllowHeaders("Access-Control-Allow-Origin")
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	config.AllowCredentials = true
+	config.ExposeHeaders = []string{"Content-Length"}
 
 	router.Use(cors.New(config))
-
-	// router.Use(cors.New(cors.Config{
-	// 	// AllowOrigins:     []string{clientIp},
-	// 	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-	// 	AllowHeaders:     []string{"Origin"},
-	// 	ExposeHeaders:    []string{"Content-Length"},
-	// 	AllowCredentials: true,
-	// }))
 	routes.NewRouter(router)
 	router.Run(":" + port)
 }
