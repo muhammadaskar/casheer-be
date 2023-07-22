@@ -20,14 +20,19 @@ func main() {
 	clientIp := os.Getenv("CLIENT_IP")
 
 	router := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{clientIp}
+	config.AddAllowHeaders("Access-Control-Allow-Origin")
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{clientIp},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
+	router.Use(cors.New(config))
+
+	// router.Use(cors.New(cors.Config{
+	// 	// AllowOrigins:     []string{clientIp},
+	// 	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+	// 	AllowHeaders:     []string{"Origin"},
+	// 	ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowCredentials: true,
+	// }))
 	routes.NewRouter(router)
 	router.Run(":" + port)
 }
