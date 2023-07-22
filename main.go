@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 
@@ -11,10 +10,6 @@ import (
 	"github.com/muhammadaskar/casheer-be/app/routes"
 )
 
-type Config struct {
-	AllowOrigins []string `json:"ALLOW_ORIGINS"`
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -22,20 +17,13 @@ func main() {
 	}
 
 	port := os.Getenv("SERVER_PORT")
-	// clientIp := os.Getenv("CLIENT_IP")
+	ORIGIN_PROD := os.Getenv("ALLOW_ORIGIN_PROD")
+	ORIGIN_DEV := os.Getenv("ALLOW_ORIGIN_DEV")
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
 
-	var conf Config
-	allowOriginsString := os.Getenv("ALLOW_ORIGINS")
-	err = json.Unmarshal([]byte(allowOriginsString), &conf.AllowOrigins)
-	if err != nil {
-		log.Fatal("Error parsing ALLOW_ORIGINS:", err)
-		return
-	}
-
-	config.AllowOrigins = conf.AllowOrigins
+	config.AllowOrigins = []string{ORIGIN_PROD, ORIGIN_DEV}
 	config.AddAllowHeaders("Access-Control-Allow-Origin")
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 	config.AllowCredentials = true
