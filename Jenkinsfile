@@ -50,7 +50,7 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name casheer-be-dev-container -p 2020:2020 \
+                sh 'docker run -d --name casheer-be-dev-container -p 2020:$(SERVER_PORT) \
                         -e DB_HOST=$(DB_HOST) \
                         -e DB_PORT=$(DB_PORT) \
                         -e DB_USER=$(DB_USER) \
