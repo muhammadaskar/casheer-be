@@ -57,7 +57,7 @@ pipeline {
                         -e DB_PASSWORD=$(DB_PASSWORD) \
                         -e DB_NAME=$(DB_NAME) \
                         -e SECRET_KEY=$(SECRET_KEY) \
-                        -e SERVER_PORT=$(SERVER_PORT) \ 
+                        -e SERVER_PORT=$(SERVER_PORT) \
                     casheer-be-dev-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
