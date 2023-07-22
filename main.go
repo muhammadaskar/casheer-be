@@ -21,7 +21,7 @@ func main() {
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://38.47.69.131:3000"}
+	config.AllowOrigins = []string{"http://38.47.69.131:3000", "http://127.0.0.1"}
 	config.AddAllowHeaders("Access-Control-Allow-Origin")
 
 	router.Use(cors.New(config))
