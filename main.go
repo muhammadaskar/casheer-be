@@ -17,11 +17,11 @@ func main() {
 	}
 
 	port := os.Getenv("SERVER_PORT")
-	clientIp := os.Getenv("CLIENT_IP")
+	// clientIp := os.Getenv("CLIENT_IP")
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{clientIp}
+	config.AllowOrigins = []string{"http://127.0.0.1:5173"}
 	config.AddAllowHeaders("Access-Control-Allow-Origin")
 
 	router.Use(cors.New(config))
