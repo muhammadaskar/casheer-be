@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -28,6 +29,8 @@ func main() {
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 	config.AllowCredentials = true
 	config.ExposeHeaders = []string{"Content-Length"}
+
+	fmt.Println(ORIGIN_PROD + "\n" + ORIGIN_DEV)
 
 	router.Use(cors.New(config))
 	routes.NewRouter(router)
