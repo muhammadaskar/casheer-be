@@ -12,6 +12,7 @@ type Service interface {
 	Login(input LoginInput) (User, error)
 	IsEmailAvailable(email string) (bool, error)
 	IsUsernameAvailable(username string) (bool, error)
+	GetUserById(ID int) (User, error)
 }
 
 type service struct {
@@ -120,6 +121,14 @@ func (s *service) IsUsernameAvailable(username string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (s *service) GetUserById(ID int) (User, error) {
+	user, err := s.repository.FindById(ID)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 func checkUsername(username string) bool {
