@@ -26,8 +26,8 @@ pipeline {
         stage('Stop Container') {
             steps {
                 echo 'Stopping the running container...'
-                sh 'docker stop dev-casheer-be-container || true'
-                sh 'docker rm dev-casheer-be-container || true'
+                sh 'docker stop casheer-be-dev-container || true'
+                sh 'docker rm casheer-be-dev-container || true'
                 echo 'Container stopped.'
             }
         }
@@ -37,10 +37,10 @@ pipeline {
                 echo 'Building Docker images...'
                 
                 // Removing previous image
-                sh 'docker rmi dev-casheer-be-image:latest || true'
+                sh 'docker rmi casheer-be-dev-image:latest || true'
                 
                 echo 'Building process...'
-                sh 'docker build -t dev-casheer-be-image:latest .'
+                sh 'docker build -t casheer-be-dev-image:latest .'
                 echo 'Showing image results'
                 sh 'docker images'
             }
@@ -50,7 +50,15 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name dev-casheer-be-container -p 3030:3030 dev-casheer-be-image:latest'
+                sh 'docker run -d --name casheer-be-dev-container -p 2020:2020 \
+                        -e DB_HOST=$(DB_HOST) \
+                        -e DB_PORT=$(DB_PORT) \
+                        -e DB_USER=$(DB_USER) \
+                        -e DB_PASSWORD=$(DB_PASSWORD) \
+                        -e DB_NAME=$(DB_NAME) \
+                        -e SECRET_KEY=$(SECRET_KEY) \
+                        -e SERVER_PORT=$(SERVER_PORT) \ 
+                    casheer-be-dev-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
             }
