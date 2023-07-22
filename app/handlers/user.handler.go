@@ -40,15 +40,14 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authService.GenerateToken(newUser.ID, newUser.Email, newUser.Role)
 	if err != nil {
 		response := helper.APIResponse(message, http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	formatter := user.FormatUser(newUser, token)
-	response := helper.APIResponse("Account has been registered", http.StatusCreated, "success", formatter)
+	formatter := user.FormatUser(newUser, "")
+	response := helper.APIResponse("Account has been registered, admin will active your account", http.StatusCreated, "success", formatter)
 	c.JSON(http.StatusCreated, response)
 }
 
