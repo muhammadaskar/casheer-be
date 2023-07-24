@@ -24,13 +24,14 @@ func main() {
 	router := gin.Default()
 	config := cors.DefaultConfig()
 
+	fmt.Println(port)
 	fmt.Println(ORIGIN_PROD + "\n" + ORIGIN_DEV)
 
-	// config.AllowOrigins = []string{ORIGIN_PROD, ORIGIN_DEV}
-	// config.AddAllowHeaders("Access-Control-Allow-Origin")
-	// config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
-	// config.AllowCredentials = true
-	// config.ExposeHeaders = []string{"Content-Length"}
+	config.AllowOrigins = []string{"http://38.47.69.131:3000", "http://127.0.0.1:3000"}
+	config.AddAllowHeaders("Access-Control-Allow-Origin")
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	config.AllowCredentials = true
+	config.ExposeHeaders = []string{"Content-Length"}
 
 	router.Use(cors.New(config))
 	routes.NewRouter(router)
