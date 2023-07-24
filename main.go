@@ -26,11 +26,11 @@ func main() {
 
 	fmt.Println(ORIGIN_PROD + "\n" + ORIGIN_DEV)
 
-	config.AllowOrigins = []string{ORIGIN_PROD, ORIGIN_DEV}
-	config.AddAllowHeaders("Access-Control-Allow-Origin")
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
-	config.AllowCredentials = true
-	config.ExposeHeaders = []string{"Content-Length"}
+	// config.AllowOrigins = []string{ORIGIN_PROD, ORIGIN_DEV}
+	// config.AddAllowHeaders("Access-Control-Allow-Origin")
+	// config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	// config.AllowCredentials = true
+	// config.ExposeHeaders = []string{"Content-Length"}
 
 	router.Use(cors.New(config))
 	routes.NewRouter(router)
