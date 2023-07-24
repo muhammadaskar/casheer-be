@@ -26,7 +26,7 @@ pipeline {
                 sh "sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/' .env"
                 sh "sed -i 's/DB_NAME=.*/DB_NAME=${DB_NAME}/' .env"
                 sh "sed -i 's/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/' .env"
-                sh "sed -i 's/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT}/' .env"
+                sh "sed -i 's/SERVER_PORT_DEV=.*/SERVER_PORT_DEV=${SERVER_PORT_DEV}/' .env"
             }
         }
         
@@ -48,7 +48,7 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name casheer-be-dev-container -p 2020:${SERVER_PORT} --env-file .env casheer-be-dev-image:latest'
+                sh 'docker run -d --name casheer-be-dev-container -p 2020:${SERVER_PORT_DEV} --env-file .env casheer-be-dev-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
             }
