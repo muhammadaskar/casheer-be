@@ -17,7 +17,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	port := os.Getenv("SERVER_PORT_DEV")
+	port := os.Getenv("SERVER_PORT")
 	ORIGIN_PROD := os.Getenv("ALLOW_ORIGIN_PROD")
 	ORIGIN_DEV := os.Getenv("ALLOW_ORIGIN_DEV")
 
@@ -27,7 +27,7 @@ func main() {
 	fmt.Println(port)
 	fmt.Println(ORIGIN_PROD + "\n" + ORIGIN_DEV)
 
-	config.AllowOrigins = []string{"http://38.47.69.131:3000", "http://127.0.0.1:3000"}
+	config.AllowOrigins = []string{ORIGIN_PROD, ORIGIN_DEV}
 	config.AddAllowHeaders("Access-Control-Allow-Origin")
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 	config.AllowCredentials = true
