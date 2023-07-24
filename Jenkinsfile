@@ -2,15 +2,9 @@ pipeline {
     agent any
     
     stages {
-        stage('Set Environment Variables'){
-            steps {
-                echo 'Environment variables set.'
-            }
-        }
-        
         stage('Pull Repositories') {
             steps {
-                echo 'Hello, World Koding!'
+                echo 'Pull Repositories!'
             }
         }
         
@@ -20,6 +14,19 @@ pipeline {
                 sh 'docker stop casheer-be-dev-container || true'
                 sh 'docker rm casheer-be-dev-container || true'
                 echo 'Container stopped.'
+            }
+        }
+
+        stage('Set Environment Variables') {
+            steps {
+                // Use Jenkins environment variables to replace values in the .env file
+                sh "sed -i 's/DB_HOST=.*/DB_HOST=${DB_HOST}/' .env"
+                sh "sed -i 's/DB_PORT=.*/DB_PORT=${DB_PORT}/' .env"
+                sh "sed -i 's/DB_USER=.*/DB_USER=${DB_USER}/' .env"
+                sh "sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/' .env"
+                sh "sed -i 's/DB_NAME=.*/DB_NAME=${DB_NAME}/' .env"
+                sh "sed -i 's/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/' .env"
+                sh "sed -i 's/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT}/' .env"
             }
         }
         
@@ -41,15 +48,7 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name casheer-be-dev-container -p 2020:$(SERVER_PORT) \
-                        -env DB_HOST=$(DB_HOST) \
-                        -env DB_PORT=$(DB_PORT) \
-                        -env DB_USER=$(DB_USER) \
-                        -env DB_PASSWORD=$(DB_PASSWORD) \
-                        -env DB_NAME=$(DB_NAME) \
-                        -env SECRET_KEY=$(SECRET_KEY) \
-                        -env SERVER_PORT=$(SERVER_PORT) \
-                    casheer-be-dev-image:latest'
+                sh 'docker run -d --name casheer-be-dev-container -p 2020:$(SERVER_PORT) --env-file .env casheer-be-dev-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
             }
