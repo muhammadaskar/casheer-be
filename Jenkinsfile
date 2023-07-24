@@ -66,7 +66,7 @@ pipeline {
     post {
         success {
             // Script to be executed if the deployment is successful
-            slackSend color: 'good', message: 'Deployment successful for *prod-casheer-be* :white_check_mark:. The application has been deployed successfully. It is now running on ${APP_URL}:${SERVER_PORT}.'
+            slackSend color: 'good', message: 'Deployment successful for *prod-casheer-be* :white_check_mark:. The application has been deployed successfully. It is now running on ${env.APP_URL}:${env.SERVER_PORT}.'
         }
         failure {
             // Script to be executed if the deployment fails
