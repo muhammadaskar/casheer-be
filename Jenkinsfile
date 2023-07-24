@@ -48,7 +48,7 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name casheer-be-dev-container -p 2020:$(SERVER_PORT) --env-file .env casheer-be-dev-image:latest'
+                sh 'docker run -d --name casheer-be-dev-container -p 2020:${SERVER_PORT} --env-file .env casheer-be-dev-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
             }
