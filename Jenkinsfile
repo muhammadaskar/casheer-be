@@ -63,4 +63,14 @@ pipeline {
             }
         }
     }
+    post {
+        success {
+            // Script to be executed if the deployment is successful
+            slackSend color: 'good', message: 'Deployment successful for prod-casheer-be! The application has been deployed successfully.'
+        }
+        failure {
+            // Script to be executed if the deployment fails
+            slackSend color: 'danger', message: 'Deployment failed for prod-casheer-be! There was an issue during the deployment process.'
+        }
+    }
 }
