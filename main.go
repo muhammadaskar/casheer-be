@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -22,6 +23,8 @@ func main() {
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
+
+	fmt.Println(ORIGIN_PROD + "\n" + ORIGIN_DEV)
 
 	config.AllowOrigins = []string{ORIGIN_PROD, ORIGIN_DEV}
 	config.AddAllowHeaders("Access-Control-Allow-Origin")
