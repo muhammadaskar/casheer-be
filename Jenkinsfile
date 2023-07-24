@@ -11,8 +11,8 @@ pipeline {
         stage('Stop Container') {
             steps {
                 echo 'Stopping the running container...'
-                sh 'docker stop casheer-be-dev-container || true'
-                sh 'docker rm casheer-be-dev-container || true'
+                sh 'docker stop prod-casheer-be-container || true'
+                sh 'docker rm prod-casheer-be-container || true'
                 echo 'Container stopped.'
             }
         }
@@ -44,10 +44,10 @@ pipeline {
                 echo 'Building Docker images...'
                 
                 // Removing previous image
-                sh 'docker rmi casheer-be-dev-image:latest || true'
+                sh 'docker rmi prod-casheer-be-image:latest || true'
                 
                 echo 'Building process...'
-                sh 'docker build -t casheer-be-dev-image:latest .'
+                sh 'docker build -t prod-casheer-be-image:latest .'
                 echo 'Showing image results'
                 sh 'docker images'
             }
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name casheer-be-dev-container -p ${SERVER_PORT}:${SERVER_PORT} --env-file .env casheer-be-dev-image:latest'
+                sh 'docker run -d --name prod-casheer-be-container -p ${SERVER_PORT}:${SERVER_PORT} --env-file .env prod-casheer-be-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
             }
