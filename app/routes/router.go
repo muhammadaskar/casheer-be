@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/muhammadaskar/casheer-be/app/auth"
+	"github.com/muhammadaskar/casheer-be/app/category"
 	"github.com/muhammadaskar/casheer-be/app/config"
 	"github.com/muhammadaskar/casheer-be/app/handlers"
 	"github.com/muhammadaskar/casheer-be/app/middleware"
@@ -13,11 +14,14 @@ func NewRouter(router *gin.Engine) {
 	db := config.InitDatabase()
 
 	userRepository := user.NewRepository(db)
+	categoryRepository := category.NewRepository(db)
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
+	categoryService := category.NewService(categoryRepository)
 
 	userHandler := handlers.NewUserHandler(userService, authService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
 
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
 
@@ -33,14 +37,9 @@ func NewRouter(router *gin.Engine) {
 		api.POST("auth/register", userHandler.Register)
 		api.POST("auth/login", userHandler.Login)
 
-		product := api.Group("product")
+		category := api.Group("category")
 		{
-			product.GET("/", authAdminMiddleware, func(c *gin.Context) {
-				c.JSON(200, gin.H{
-					"success": true,
-					"message": "product",
-				})
-			})
+			category.GET("/", authAdminMiddleware, categoryHandler.FindAll)
 		}
 
 	}
