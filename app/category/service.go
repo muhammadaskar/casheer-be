@@ -4,7 +4,7 @@ import "errors"
 
 type Service interface {
 	FindAll() ([]Category, error)
-	FindById(ID GetCategoryInputID) (Category, error)
+	FindById(input GetCategoryInputID) (Category, error)
 }
 
 type service struct {
@@ -23,8 +23,8 @@ func (s *service) FindAll() ([]Category, error) {
 	return category, nil
 }
 
-func (s *service) FindById(ID GetCategoryInputID) (Category, error) {
-	category, err := s.repository.FindById(ID)
+func (s *service) FindById(input GetCategoryInputID) (Category, error) {
+	category, err := s.repository.FindById(input.ID)
 	if err != nil {
 		return category, err
 	}
