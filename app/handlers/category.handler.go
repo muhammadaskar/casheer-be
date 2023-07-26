@@ -40,7 +40,7 @@ func (h *CategoryHandler) FindById(c *gin.Context) {
 
 	getCategory, err := h.categoryService.FindById(input)
 	if err != nil {
-		response := helper.APIResponse("failed to get detail of category", http.StatusBadRequest, "error", nil)
+		response := helper.APIResponse(err.Error(), http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
