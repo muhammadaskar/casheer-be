@@ -40,6 +40,7 @@ func NewRouter(router *gin.Engine) {
 		category := api.Group("category")
 		{
 			category.GET("/", authAdminMiddleware, categoryHandler.FindAll)
+			category.GET("/:id", authAdminMiddleware, categoryHandler.FindById)
 		}
 
 	}

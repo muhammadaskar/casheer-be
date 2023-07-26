@@ -27,3 +27,24 @@ func (h *CategoryHandler) FindAll(c *gin.Context) {
 	response := helper.APIResponse("List of categories", http.StatusOK, "success", category.FormatCategories(categories))
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *CategoryHandler) FindById(c *gin.Context) {
+	var input category.GetCategoryInputID
+
+	err := c.ShouldBindUri(&input)
+	if err != nil {
+		response := helper.APIResponse("failed to get detail of category", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	getCategory, err := h.categoryService.FindById(input)
+	if err != nil {
+		response := helper.APIResponse("failed to get detail of category", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Detail of category", http.StatusOK, "success", category.FormatCategory(getCategory))
+	c.JSON(http.StatusOK, response)
+}

@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Repository interface {
 	FindAll() ([]Category, error)
+	FindById(ID GetCategoryInputID) (Category, error)
 }
 
 type repository struct {
@@ -21,4 +22,14 @@ func (r *repository) FindAll() ([]Category, error) {
 		return categories, err
 	}
 	return categories, nil
+}
+
+func (r *repository) FindById(ID GetCategoryInputID) (Category, error) {
+	var category Category
+	err := r.db.Where("id = ?", ID).Find(&category).Error
+	if err != nil {
+		return category, err
+	}
+
+	return category, nil
 }
