@@ -5,6 +5,7 @@ import "errors"
 type Service interface {
 	FindAll() ([]Category, error)
 	FindById(input GetCategoryInputID) (Category, error)
+	Create(input CreateCategoryInput) (Category, error)
 }
 
 type service struct {
@@ -34,4 +35,16 @@ func (s *service) FindById(input GetCategoryInputID) (Category, error) {
 	}
 
 	return category, nil
+}
+
+func (s *service) Create(input CreateCategoryInput) (Category, error) {
+	category := Category{}
+	category.Name = input.Name
+
+	newCategory, err := s.repository.Save(category)
+	if err != nil {
+		return newCategory, err
+	}
+
+	return newCategory, nil
 }

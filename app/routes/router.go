@@ -41,6 +41,7 @@ func NewRouter(router *gin.Engine) {
 		{
 			category.GET("/", authAdminMiddleware, categoryHandler.FindAll)
 			category.GET("/:id", authAdminMiddleware, categoryHandler.FindById)
+			category.POST("/", authAdminMiddleware, categoryHandler.Create)
 		}
 
 	}

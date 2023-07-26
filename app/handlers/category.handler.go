@@ -48,3 +48,24 @@ func (h *CategoryHandler) FindById(c *gin.Context) {
 	response := helper.APIResponse("Detail of category", http.StatusOK, "success", category.FormatCategory(getCategory))
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *CategoryHandler) Create(c *gin.Context) {
+	var input category.CreateCategoryInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := helper.APIResponse("Failed to create category", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	newCategory, err := h.categoryService.Create(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to create category", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("category created successfully", http.StatusCreated, "success", category.FormatCategory(newCategory))
+	c.JSON(http.StatusCreated, response)
+}
