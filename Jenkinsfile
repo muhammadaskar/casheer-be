@@ -11,8 +11,8 @@ pipeline {
         stage('Stop Container') {
             steps {
                 echo 'Stopping the running container...'
-                sh 'docker stop prod-casheer-be-container || true'
-                sh 'docker rm prod-casheer-be-container || true'
+                sh 'docker stop dev-casheer-be-container || true'
+                sh 'docker rm dev-casheer-be-container || true'
                 echo 'Container stopped.'
             }
         }
@@ -35,7 +35,7 @@ pipeline {
                 sh "sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/' .env"
                 sh "sed -i 's/DB_NAME=.*/DB_NAME=${DB_NAME}/' .env"
                 sh "sed -i 's/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/' .env"
-                sh "sed -i 's/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT}/' .env"
+                sh "sed -i 's/SERVER_PORT_DEV=.*/SERVER_PORT_DEV=${SERVER_PORT_DEV}/' .env"
             }
         }
         
@@ -44,10 +44,10 @@ pipeline {
                 echo 'Building Docker images...'
                 
                 // Removing previous image
-                sh 'docker rmi prod-casheer-be-image:latest || true'
+                sh 'docker rmi dev-casheer-be-image:latest || true'
                 
                 echo 'Building process...'
-                sh 'docker build -t prod-casheer-be-image:latest .'
+                sh 'docker build -t dev-casheer-be-image:latest .'
                 echo 'Showing image results'
                 sh 'docker images'
             }
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 echo 'Running the container...'
                 
-                sh 'docker run -d --name prod-casheer-be-container -p ${SERVER_PORT}:${SERVER_PORT} --env-file .env prod-casheer-be-image:latest'
+                sh 'docker run -d --name dev-casheer-be-container -p ${SERVER_PORT_DEV}:${SERVER_PORT_DEV} --env-file .env dev-casheer-be-image:latest'
                 echo 'Container is now running.'
                 sh 'docker ps'
             }
@@ -66,11 +66,11 @@ pipeline {
     post {
         success {
             // Script to be executed if the deployment is successful
-            slackSend color: 'good', message: 'Deployment successful for *prod-casheer-be* :white_check_mark:. The application has been deployed successfully. It is now running on ${env.APP_URL}:${env.SERVER_PORT}.'
+            slackSend color: 'good', message: 'Deployment successful for *dev-casheer-be* :white_check_mark:. The application has been deployed successfully..'
         }
         failure {
             // Script to be executed if the deployment fails
-            slackSend color: 'danger', message: 'Deployment failed for *prod-casheer-be* :x:. There was an issue during the deployment process.'
+            slackSend color: 'danger', message: 'Deployment failed for *dev-casheer-be* :x:. There was an issue during the deployment process.'
         }
     }
 }
