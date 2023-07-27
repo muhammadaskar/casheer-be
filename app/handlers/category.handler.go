@@ -69,3 +69,35 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 	response := helper.APIResponse("category created successfully", http.StatusCreated, "success", category.FormatCategory(newCategory))
 	c.JSON(http.StatusCreated, response)
 }
+
+func (h *CategoryHandler) Update(c *gin.Context) {
+	var inputID category.GetCategoryInputID
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed to update cateogry", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var inputData category.CreateCategoryInput
+	err = c.ShouldBindJSON(&inputData)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to update category", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	updateCategory, err := h.categoryService.UpdateCategory(inputID, inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed to update category", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Success to update category", http.StatusOK, "success", category.FormatCategory(updateCategory))
+	c.JSON(http.StatusOK, response)
+}

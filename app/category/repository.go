@@ -6,6 +6,7 @@ type Repository interface {
 	FindAll() ([]Category, error)
 	FindById(ID int) (Category, error)
 	Save(category Category) (Category, error)
+	Update(category Category) (Category, error)
 }
 
 type repository struct {
@@ -37,6 +38,15 @@ func (r *repository) FindById(ID int) (Category, error) {
 
 func (r *repository) Save(category Category) (Category, error) {
 	err := r.db.Create(&category).Error
+	if err != nil {
+		return category, err
+	}
+
+	return category, nil
+}
+
+func (r *repository) Update(category Category) (Category, error) {
+	err := r.db.Save(&category).Error
 	if err != nil {
 		return category, err
 	}

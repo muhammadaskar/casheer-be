@@ -6,6 +6,7 @@ type Service interface {
 	FindAll() ([]Category, error)
 	FindById(input GetCategoryInputID) (Category, error)
 	Create(input CreateCategoryInput) (Category, error)
+	UpdateCategory(inputId GetCategoryInputID, input CreateCategoryInput) (Category, error)
 }
 
 type service struct {
@@ -47,4 +48,20 @@ func (s *service) Create(input CreateCategoryInput) (Category, error) {
 	}
 
 	return newCategory, nil
+}
+
+func (s *service) UpdateCategory(inputID GetCategoryInputID, input CreateCategoryInput) (Category, error) {
+	category, err := s.repository.FindById(inputID.ID)
+	if err != nil {
+		return category, err
+	}
+
+	category.Name = input.Name
+
+	updateCategory, err := s.repository.Update(category)
+	if err != nil {
+		return updateCategory, err
+	}
+
+	return updateCategory, nil
 }
