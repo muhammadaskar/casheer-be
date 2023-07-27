@@ -17,7 +17,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	port := os.Getenv("SERVER_PORT")
+	port := os.Getenv("SERVER_PORT_DEV")
 	ORIGIN_PROD := os.Getenv("ALLOW_ORIGIN_PROD")
 	ORIGIN_DEV := os.Getenv("ALLOW_ORIGIN_DEV")
 
