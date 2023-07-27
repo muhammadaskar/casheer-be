@@ -10,7 +10,7 @@ import (
 	"github.com/muhammadaskar/casheer-be/app/user"
 )
 
-func NewRouter() router *gin.Engine {
+func NewRouter(router *gin.Engine) {
 	db := config.InitDatabase()
 
 	userRepository := user.NewRepository(db)
@@ -25,8 +25,6 @@ func NewRouter() router *gin.Engine {
 
 	authMiddleware := middleware.AuthMiddleware(authService, userService)
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
-
-	
 
 	api := router.Group("api/v1")
 	{
@@ -48,6 +46,4 @@ func NewRouter() router *gin.Engine {
 		api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
 		// }
 	}
-
-	return api
 }
