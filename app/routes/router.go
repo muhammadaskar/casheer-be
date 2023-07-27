@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/muhammadaskar/casheer-be/app/auth"
 	"github.com/muhammadaskar/casheer-be/app/category"
@@ -46,4 +47,13 @@ func NewRouter(router *gin.Engine) {
 		api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
 		// }
 	}
+
+	config := cors.DefaultConfig()
+
+	config.AllowOrigins = []string{"http://38.47.69.131:2000"}
+	config.AddAllowHeaders("Access-Control-Allow-Origin")
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	config.AllowCredentials = true
+	config.ExposeHeaders = []string{"Content-Length"}
+	api.Use(cors.New(config))
 }

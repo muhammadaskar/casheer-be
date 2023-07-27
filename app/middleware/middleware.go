@@ -50,18 +50,18 @@ func AuthMiddleware(authService auth.Service, userService user.Service) gin.Hand
 			return
 		}
 
-		userRole := int(claim["role"].(float64))
+		// userRole := int(claim["role"].(float64))
 
-		if userRole != 0 || userRole != 1 {
-			if userRole != user.Role {
-				response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
-				ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
-				return
-			}
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
-			return
-		}
+		// if userRole != 0 || userRole != 1 {
+		// 	if userRole != user.Role {
+		// 		response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+		// 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		// 		return
+		// 	}
+		// 	response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+		// 	ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		// 	return
+		// }
 
 		ctx.Set("currentUser", user)
 	}
