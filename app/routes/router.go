@@ -23,6 +23,7 @@ func NewRouter(router *gin.Engine) {
 	userHandler := handlers.NewUserHandler(userService, authService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 
+	authMiddleware := middleware.AuthMiddleware(authService, userService)
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
 
 	api := router.Group("api/v1")
@@ -39,8 +40,8 @@ func NewRouter(router *gin.Engine) {
 
 		category := api.Group("category")
 		{
-			category.GET("/", authAdminMiddleware, categoryHandler.FindAll)
-			category.GET("/:id", authAdminMiddleware, categoryHandler.FindById)
+			category.GET("/", authMiddleware, categoryHandler.FindAll)
+			category.GET("/:id", authMiddleware, categoryHandler.FindById)
 			category.POST("/", authAdminMiddleware, categoryHandler.Create)
 			category.PUT("/:id", authAdminMiddleware, categoryHandler.Update)
 		}
