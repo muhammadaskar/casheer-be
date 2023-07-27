@@ -58,6 +58,9 @@ func AuthMiddleware(authService auth.Service, userService user.Service) gin.Hand
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 				return
 			}
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
 		}
 
 		ctx.Set("currentUser", user)
