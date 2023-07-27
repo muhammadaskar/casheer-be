@@ -38,12 +38,12 @@ func NewRouter(router *gin.Engine) {
 		api.POST("auth/register", userHandler.Register)
 		api.POST("auth/login", userHandler.Login)
 
-		category := api.Group("category")
-		{
-			category.GET("/", authMiddleware, categoryHandler.FindAll)
-			category.GET("/:id", authMiddleware, categoryHandler.FindById)
-			category.POST("/", authAdminMiddleware, categoryHandler.Create)
-			category.PUT("/:id", authAdminMiddleware, categoryHandler.Update)
-		}
+		// category := api.Group("category")
+		// {
+		api.GET("/category", authMiddleware, categoryHandler.FindAll)
+		api.GET("/category/:id", authMiddleware, categoryHandler.FindById)
+		api.POST("/category", authAdminMiddleware, categoryHandler.Create)
+		api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
+		// }
 	}
 }
