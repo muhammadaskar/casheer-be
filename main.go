@@ -27,9 +27,9 @@ func main() {
 	fmt.Println(port)
 	fmt.Println(ORIGIN_PROD + "\n" + ORIGIN_DEV)
 
-	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:3000"}
+	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Authorization", "Content-Type", "Access-Control-Allow-Origin"}
+	config.AllowHeaders = []string{"Authorization", "Content-Type"}
 	config.AllowCredentials = true
 
 	router.Use(cors.New(config))
