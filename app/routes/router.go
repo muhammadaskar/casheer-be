@@ -24,14 +24,6 @@ func NewRouter() *gin.Engine {
 		log.Fatal("Error loading .env file")
 	}
 
-	// Middleware CORS
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Authorization", "Content-Type"}
-	config.AllowCredentials = true
-	router.Use(cors.New(config))
-
 	userRepository := user.NewRepository(db)
 	notificationRepository := notification.NewRepository(db)
 	categoryRepository := category.NewRepository(db)
@@ -50,6 +42,14 @@ func NewRouter() *gin.Engine {
 
 	api := router.Group("api/v1")
 	{
+		// Middleware CORS
+		config := cors.DefaultConfig()
+		config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+		config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+		config.AllowHeaders = []string{"Authorization", "Content-Type"}
+		config.AllowCredentials = true
+		router.Use(cors.New(config))
+
 		api.GET("/", func(c *gin.Context) {
 			c.JSON(200, gin.H{
 				"success": true,
