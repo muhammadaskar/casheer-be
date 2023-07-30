@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 
+	"github.com/muhammadaskar/casheer-be/app/notification"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -65,6 +66,16 @@ func (s *service) Register(input RegisterInput) (User, error) {
 
 	newUser, err := s.repository.Save(user)
 
+	if err != nil {
+		return newUser, err
+	}
+
+	notification := notification.Notification{}
+	notification.Name = newUser.Name + " baru saja melakukan registrasi"
+	notification.UserId = newUser.ID
+	notification.Type = 1
+
+	_, err = s.repository.CreateNotification(notification)
 	if err != nil {
 		return newUser, err
 	}

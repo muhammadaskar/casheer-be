@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/muhammadaskar/casheer-be/app/category"
+	"github.com/muhammadaskar/casheer-be/app/notification"
+
+	// "github.com/muhammadaskar/casheer-be/app/product"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -32,7 +34,10 @@ func main() {
 
 	// Membuat tabel "users"
 	// err = db.AutoMigrate(&user.User{})
-	err = db.AutoMigrate(&category.Category{})
+	// err = db.AutoMigrate(&category.Category{})
+	// db.AutoMigrate(&product.Product{})
+	err = db.AutoMigrate(&notification.Notification{})
+	fmt.Println(err)
 	if err != nil {
 		panic("Failed to migrate database")
 	}

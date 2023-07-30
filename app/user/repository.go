@@ -1,12 +1,16 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"github.com/muhammadaskar/casheer-be/app/notification"
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	Save(user User) (User, error)
 	FindByEmail(email string) (User, error)
 	FindByUsername(username string) (User, error)
 	FindById(ID int) (User, error)
+	CreateNotification(notification notification.Notification) (notification.Notification, error)
 }
 
 type repository struct {
@@ -58,4 +62,13 @@ func (r *repository) FindById(ID int) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *repository) CreateNotification(notification notification.Notification) (notification.Notification, error) {
+	err := r.db.Create(&notification).Error
+	if err != nil {
+		return notification, err
+	}
+
+	return notification, nil
 }
