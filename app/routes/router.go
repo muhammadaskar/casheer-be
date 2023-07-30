@@ -48,7 +48,7 @@ func NewRouter() *gin.Engine {
 		config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 		config.AllowHeaders = []string{"Authorization", "Content-Type"}
 		config.AllowCredentials = true
-		router.Use(cors.New(config))
+		api.Use(cors.New(config))
 
 		api.GET("/", func(c *gin.Context) {
 			c.JSON(200, gin.H{
