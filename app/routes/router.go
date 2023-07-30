@@ -40,15 +40,16 @@ func NewRouter() *gin.Engine {
 	authMiddleware := middleware.AuthMiddleware(authService, userService)
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
 
+	// Middleware CORS
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}
+	config.AllowHeaders = []string{"Content-Type", "Authorization"}
+	config.AllowCredentials = true
+	router.Use(cors.New(config))
+
 	api := router.Group("api/v1")
 	{
-		// Middleware CORS
-		config := cors.DefaultConfig()
-		config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-		config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}
-		config.AllowHeaders = []string{"Content-Type", "Authorization"}
-		config.AllowCredentials = true
-		api.Use(cors.New(config))
 
 		api.GET("/", func(c *gin.Context) {
 			c.JSON(200, gin.H{
