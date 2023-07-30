@@ -62,6 +62,7 @@ func NewRouter() *gin.Engine {
 
 		category := api.Group("category")
 		{
+			category.Use(cors.New(config))
 			category.GET("/", authMiddleware, categoryHandler.FindAll)
 			category.GET("/:id", authMiddleware, categoryHandler.FindById)
 			category.POST("/", authAdminMiddleware, categoryHandler.Create)
@@ -70,6 +71,7 @@ func NewRouter() *gin.Engine {
 
 		notification := api.Group("notification")
 		{
+			notification.Use(cors.New(config))
 			notification.GET("/", authAdminMiddleware, notificationHandler.FindAll)
 		}
 	}
