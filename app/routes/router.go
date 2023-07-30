@@ -1,7 +1,11 @@
 package routes
 
 import (
+	"log"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/muhammadaskar/casheer-be/app/auth"
 	"github.com/muhammadaskar/casheer-be/app/category"
 	"github.com/muhammadaskar/casheer-be/app/config"
@@ -11,8 +15,22 @@ import (
 	"github.com/muhammadaskar/casheer-be/app/user"
 )
 
-func NewRouter(router *gin.Engine) {
+func NewRouter() *gin.Engine {
+	router := gin.Default()
 	db := config.InitDatabase()
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	// Middleware CORS
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Authorization", "Content-Type"}
+	config.AllowCredentials = true
+	router.Use(cors.New(config))
 
 	userRepository := user.NewRepository(db)
 	notificationRepository := notification.NewRepository(db)
@@ -55,4 +73,6 @@ func NewRouter(router *gin.Engine) {
 			notification.GET("/", authAdminMiddleware, notificationHandler.FindAll)
 		}
 	}
+
+	return router
 }
