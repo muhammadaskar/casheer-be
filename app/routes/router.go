@@ -48,13 +48,21 @@ func NewRouter() *gin.Engine {
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
 
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"success": true,
+			"message": "hello world",
+		})
+	})
+
 	api := router.Group("api/v1")
 	{
 
+		api.Use(cors.New(config))
 		api.GET("/", func(c *gin.Context) {
 			c.JSON(200, gin.H{
 				"success": true,
-				"message": "hello world",
+				"message": "this is api for casheer app",
 			})
 		})
 
