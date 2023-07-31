@@ -26,6 +26,6 @@ func main() {
 	config.AllowHeaders = []string{"Content-Type", "Authorization"}
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
-	router.Run(port)
+	router.Run(":" + port)
 	// http.ListenAndServe(":"+port, router)
 }
