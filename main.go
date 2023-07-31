@@ -21,8 +21,8 @@ func main() {
 
 	// Middleware CORS
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}
+	config.AllowOrigins = []string{"http://38.47.69.131:2000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Content-Type", "Authorization", "Access-Control-Allow-Origin"}
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
