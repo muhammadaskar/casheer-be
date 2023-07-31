@@ -3,7 +3,7 @@ package routes
 import (
 	"log"
 
-	// "github.com/gin-contrib/cors"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/muhammadaskar/casheer-be/app/auth"
@@ -41,12 +41,12 @@ func NewRouter() *gin.Engine {
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
 
 	// Middleware CORS
-	// config := cors.DefaultConfig()
-	// config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-	// config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}
-	// config.AllowHeaders = []string{"Content-Type", "Authorization"}
-	// config.AllowCredentials = true
-	// router.Use(cors.New(config))
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}
+	config.AllowHeaders = []string{"Content-Type", "Authorization"}
+	config.AllowCredentials = true
+	router.Use(cors.New(config))
 
 	api := router.Group("api/v1")
 	{
