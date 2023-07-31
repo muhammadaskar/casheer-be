@@ -2,9 +2,10 @@ package main
 
 import (
 	"log"
-	"net/http"
+	// "net/http"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/joho/godotenv"
 	"github.com/muhammadaskar/casheer-be/app/routes"
 )
@@ -17,5 +18,14 @@ func main() {
 
 	port := os.Getenv("SERVER_PORT_DEV")
 	router := routes.NewRouter()
-	http.ListenAndServe(":"+port, router)
+
+	// Middleware CORS
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}
+	config.AllowHeaders = []string{"Content-Type", "Authorization"}
+	config.AllowCredentials = true
+	router.Use(cors.New(config))
+	router.Run(port)
+	// http.ListenAndServe(":"+port, router)
 }
