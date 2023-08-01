@@ -3,7 +3,7 @@ package routes
 import (
 	"log"
 
-	"github.com/gin-contrib/cors"
+	// "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/muhammadaskar/casheer-be/app/auth"
@@ -15,8 +15,8 @@ import (
 	"github.com/muhammadaskar/casheer-be/app/user"
 )
 
-func NewRouter() *gin.Engine {
-	router := gin.Default()
+func NewRouter(router *gin.Engine) {
+	// router := gin.Default()
 	db := config.InitDatabase()
 
 	err := godotenv.Load()
@@ -40,13 +40,16 @@ func NewRouter() *gin.Engine {
 	authMiddleware := middleware.AuthMiddleware(authService, userService)
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
 
-	// Middleware CORS
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Content-Type", "Authorization", "Access-Control-Allow-Origin"}
-	config.AllowCredentials = true
-	router.Use(cors.New(config))
+	// config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://127.0.0.1:2000"}
+	// // config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+	// config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	// config.AllowHeaders = []string{"Content-Type", "Authorization"}
+	// config.AllowCredentials = true
+
+	// router.Use(cors.New(config))
+
+	// router.Use(CORSMiddleware())
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -57,8 +60,10 @@ func NewRouter() *gin.Engine {
 
 	api := router.Group("api/v1")
 	{
+		// Middleware CORS
+		// api.Use(CORSMiddleware())
+		// api.Use(cors.New(config))
 
-		api.Use(cors.New(config))
 		api.GET("/", func(c *gin.Context) {
 			c.JSON(200, gin.H{
 				"success": true,
@@ -69,21 +74,49 @@ func NewRouter() *gin.Engine {
 		api.POST("auth/register", userHandler.Register)
 		api.POST("auth/login", userHandler.Login)
 
-		category := api.Group("category")
-		{
-			// category.Use(cors.New(config))
-			category.GET("/", authMiddleware, categoryHandler.FindAll)
-			category.GET("/:id", authMiddleware, categoryHandler.FindById)
-			category.POST("/", authAdminMiddleware, categoryHandler.Create)
-			category.PUT("/:id", authAdminMiddleware, categoryHandler.Update)
-		}
+		// category := api.Group("category")
+		// {
+		// category.Use(cors.New(config))
+		api.GET("/category", authMiddleware, categoryHandler.FindAll)
+		api.GET("/category/:id", authMiddleware, categoryHandler.FindById)
+		api.POST("/category", authAdminMiddleware, categoryHandler.Create)
+		api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
+		// }
 
-		notification := api.Group("notification")
-		{
-			// notification.Use(cors.New(config))
-			notification.GET("/", authAdminMiddleware, notificationHandler.FindAll)
-		}
+		// notification := api.Group("notification")
+		// {
+		// 	// notification.Use(cors.New(config))
+		api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
+		// }
 	}
 
-	return router
+	// return router
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Define the list of allowed origins
+		// allowedOrigins := []string{
+		// 	"http://127.0.0.1",
+		// }
+
+		// origin := c.Request.Header.Get("Origin")
+		// for _, allowedOrigin := range allowedOrigins {
+		// 	if origin == allowedOrigin {
+		// 		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+		// 		break
+		// 	}
+		// }
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:2000")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		// if c.Request.Method == "OPTIONS" {
+		// 	c.AbortWithStatus(204)
+		// 	return
+		// }
+
+		// c.Next()
+	}
 }
