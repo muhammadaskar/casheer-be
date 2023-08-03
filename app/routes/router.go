@@ -77,7 +77,12 @@ func NewRouter(router *gin.Engine) {
 	// category := api.Group("category")
 	// {
 	// category.Use(cors.New(config))
-	router.GET("/api/v1/category", authMiddleware, categoryHandler.FindAll)
+	router.GET("/api/v1/category", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{
+			"success": true,
+			"data":    []string{"Hello world", "ini adalah data"},
+		})
+	})
 	router.GET("/api/v1/category/:id", authMiddleware, categoryHandler.FindById)
 	router.POST("/api/v1/category", authAdminMiddleware, categoryHandler.Create)
 	router.PUT("/api/v1/category/:id", authAdminMiddleware, categoryHandler.Update)
