@@ -51,44 +51,44 @@ func NewRouter(router *gin.Engine) {
 
 	// router.Use(CORSMiddleware())
 
-	router.GET("/", func(c *gin.Context) {
+	// router.GET("/", func(c *gin.Context) {
+	// 	c.JSON(200, gin.H{
+	// 		"success": true,
+	// 		"message": "hello world",
+	// 	})
+	// })
+
+	// api := router.Group("api/v1")
+	// {
+	// Middleware CORS
+	// api.Use(CORSMiddleware())
+	// api.Use(cors.New(config))
+
+	router.GET("/api/v1", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": true,
-			"message": "hello world",
+			"message": "this is api for casheer app",
 		})
 	})
 
-	api := router.Group("api/v1")
-	{
-		// Middleware CORS
-		// api.Use(CORSMiddleware())
-		// api.Use(cors.New(config))
+	router.POST("/api/v1/auth/register", userHandler.Register)
+	router.POST("/api/v1/auth/login", userHandler.Login)
 
-		api.GET("/", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"success": true,
-				"message": "this is api for casheer app",
-			})
-		})
+	// category := api.Group("category")
+	// {
+	// category.Use(cors.New(config))
+	router.GET("/api/v1/category", authMiddleware, categoryHandler.FindAll)
+	router.GET("/api/v1/category/:id", authMiddleware, categoryHandler.FindById)
+	router.POST("/api/v1/category", authAdminMiddleware, categoryHandler.Create)
+	router.PUT("/api/v1/category/:id", authAdminMiddleware, categoryHandler.Update)
+	// }
 
-		api.POST("auth/register", userHandler.Register)
-		api.POST("auth/login", userHandler.Login)
-
-		category := api.Group("category")
-		{
-			// category.Use(cors.New(config))
-			category.GET("/", authMiddleware, categoryHandler.FindAll)
-			category.GET("/:id", authMiddleware, categoryHandler.FindById)
-			category.POST("/", authAdminMiddleware, categoryHandler.Create)
-			category.PUT("/:id", authAdminMiddleware, categoryHandler.Update)
-		}
-
-		// notification := api.Group("notification")
-		// {
-		// 	// notification.Use(cors.New(config))
-		api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
-		// }
-	}
+	// notification := api.Group("notification")
+	// {
+	// 	// notification.Use(cors.New(config))
+	router.GET("/api/v1/notification", authAdminMiddleware, notificationHandler.FindAll)
+	// }
+	// }
 
 	// return router
 }
@@ -110,13 +110,13 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:2000")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, HEAD")
 
-		// if c.Request.Method == "OPTIONS" {
-		// 	c.AbortWithStatus(204)
-		// 	return
-		// }
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
 
-		// c.Next()
+		c.Next()
 	}
 }

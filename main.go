@@ -22,12 +22,19 @@ func main() {
 	router := gin.Default()
 
 	// // Middleware CORS
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Content-Type", "Access-Control-Allow-Origin"}
-	config.AllowCredentials = true
-	router.Use(cors.New(config))
+	// config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://127.0.0.1:2000"}
+	// config.AllowMethods = []string{"GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"}
+	// config.AllowHeaders = []string{"Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"}
+	// config.AllowCredentials = true
+
+	// router.Use(cors.New(config))
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	}))
 	routes.NewRouter(router)
 	router.Run(":" + port)
 	// http.ListenAndServe(":"+port, router)
