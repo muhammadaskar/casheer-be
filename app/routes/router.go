@@ -3,7 +3,7 @@ package routes
 import (
 	"log"
 
-	// "github.com/gin-contrib/cors"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/muhammadaskar/casheer-be/app/auth"
@@ -15,8 +15,8 @@ import (
 	"github.com/muhammadaskar/casheer-be/app/user"
 )
 
-func NewRouter(router *gin.Engine) {
-	// router := gin.Default()
+func NewRouter() *gin.Engine {
+	router := gin.Default()
 	db := config.InitDatabase()
 
 	err := godotenv.Load()
@@ -40,62 +40,57 @@ func NewRouter(router *gin.Engine) {
 	authMiddleware := middleware.AuthMiddleware(authService, userService)
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
 
-	// config := cors.DefaultConfig()
-	// config.AllowOrigins = []string{"http://127.0.0.1:2000"}
-	// // config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-	// config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
-	// config.AllowHeaders = []string{"Content-Type", "Authorization"}
-	// config.AllowCredentials = true
+	// CORS MIDDLEWARE
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	config.AllowHeaders = []string{"Content-Type", "Authorization"}
+	config.AllowCredentials = true
 
 	// router.Use(cors.New(config))
+	router.Use(cors.New(config))
 
 	// router.Use(CORSMiddleware())
 
-	// router.GET("/", func(c *gin.Context) {
-	// 	c.JSON(200, gin.H{
-	// 		"success": true,
-	// 		"message": "hello world",
-	// 	})
-	// })
-
-	// api := router.Group("api/v1")
-	// {
-	// Middleware CORS
-	// api.Use(CORSMiddleware())
-	// api.Use(cors.New(config))
-
-	router.GET("/api/v1", func(c *gin.Context) {
+	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": true,
-			"message": "this is api for casheer app",
+			"message": "hello world",
 		})
 	})
 
-	router.POST("/api/v1/auth/register", userHandler.Register)
-	router.POST("/api/v1/auth/login", userHandler.Login)
+	api := router.Group("api/v1")
+	{
+		// Middleware CORS
+		// api.Use(CORSMiddleware())
 
-	// category := api.Group("category")
-	// {
-	// category.Use(cors.New(config))
-	router.GET("/api/v1/category", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"success": true,
-			"data":    []string{"Hello world", "ini adalah data"},
+		api.GET("/", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"success": true,
+				"message": "this is api for casheer app",
+			})
 		})
-	})
-	router.GET("/api/v1/category/:id", authMiddleware, categoryHandler.FindById)
-	router.POST("/api/v1/category", authAdminMiddleware, categoryHandler.Create)
-	router.PUT("/api/v1/category/:id", authAdminMiddleware, categoryHandler.Update)
-	// }
 
-	// notification := api.Group("notification")
-	// {
-	// 	// notification.Use(cors.New(config))
-	router.GET("/api/v1/notification", authAdminMiddleware, notificationHandler.FindAll)
-	// }
-	// }
+		api.POST("/auth/register", userHandler.Register)
+		api.POST("/auth/login", userHandler.Login)
 
-	// return router
+		// category := api.Group("category")
+		// {
+		// category.Use(cors.New(config))
+		api.GET("/category", authMiddleware, categoryHandler.FindAll)
+		api.GET("/category/:id", authMiddleware, categoryHandler.FindById)
+		api.POST("/category", authAdminMiddleware, categoryHandler.Create)
+		api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
+		// }
+
+		// notification := api.Group("notification")
+		// {
+		// 	// notification.Use(cors.New(config))
+		api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
+		// }
+	}
+
+	return router
 }
 
 func CORSMiddleware() gin.HandlerFunc {
