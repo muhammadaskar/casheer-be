@@ -59,36 +59,55 @@ func NewRouter() *gin.Engine {
 		})
 	})
 
+	// api := router.Group("api/v1")
+	// {
+	// 	// Middleware CORS
+	// 	// api.Use(CORSMiddleware())
+
+	// 	api.GET("/", func(c *gin.Context) {
+	// 		c.JSON(200, gin.H{
+	// 			"success": true,
+	// 			"message": "this is api for casheer app",
+	// 		})
+	// 	})
+
+	// 	api.POST("/auth/register", userHandler.Register)
+	// 	api.POST("/auth/login", userHandler.Login)
+
+	// 	// category := api.Group("category")
+	// 	// {
+	// 	// category.Use(cors.New(config))
+	// 	api.GET("/category", authMiddleware, categoryHandler.FindAll)
+	// 	api.GET("/category/:id", authMiddleware, categoryHandler.FindById)
+	// 	api.POST("/category", authAdminMiddleware, categoryHandler.Create)
+	// 	api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
+	// 	// }
+
+	// 	// notification := api.Group("notification")
+	// 	// {
+	// 	// 	// notification.Use(cors.New(config))
+	// 	api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
+	// 	// }
+	// }
 	api := router.Group("api/v1")
-	{
-		// Middleware CORS
-		// api.Use(CORSMiddleware())
 
-		api.GET("/", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"success": true,
-				"message": "this is api for casheer app",
-			})
+	api.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"success": true,
+			"message": "this is api for casheer app",
 		})
+	})
+	api.POST("/auth/register", userHandler.Register)
+	api.POST("/auth/login", userHandler.Login)
 
-		api.POST("/auth/register", userHandler.Register)
-		api.POST("/auth/login", userHandler.Login)
+	categoryRouter := api.Group("category")
 
-		// category := api.Group("category")
-		// {
-		// category.Use(cors.New(config))
-		api.GET("/category", authMiddleware, categoryHandler.FindAll)
-		api.GET("/category/:id", authMiddleware, categoryHandler.FindById)
-		api.POST("/category", authAdminMiddleware, categoryHandler.Create)
-		api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
-		// }
+	categoryRouter.GET("/", authMiddleware, categoryHandler.FindAll)
+	categoryRouter.GET("/:id", authMiddleware, categoryHandler.FindById)
+	categoryRouter.POST("/", authAdminMiddleware, categoryHandler.Create)
+	categoryRouter.PUT("/:id", authAdminMiddleware, categoryHandler.Update)
 
-		// notification := api.Group("notification")
-		// {
-		// 	// notification.Use(cors.New(config))
-		api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
-		// }
-	}
+	api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
 
 	return router
 }
