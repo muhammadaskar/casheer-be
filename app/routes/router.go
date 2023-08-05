@@ -101,6 +101,7 @@ func NewRouter() *gin.Engine {
 	api.POST("/auth/login", userHandler.Login)
 
 	categoryRouter := api.Group("category")
+	categoryRouter.Use(cors.New(config))
 
 	categoryRouter.GET("/", authMiddleware, categoryHandler.FindAll)
 	categoryRouter.GET("/:id", authMiddleware, categoryHandler.FindById)
