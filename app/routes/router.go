@@ -12,6 +12,7 @@ import (
 	"github.com/muhammadaskar/casheer-be/app/handlers"
 	"github.com/muhammadaskar/casheer-be/app/middleware"
 	"github.com/muhammadaskar/casheer-be/app/notification"
+	"github.com/muhammadaskar/casheer-be/app/product"
 	"github.com/muhammadaskar/casheer-be/app/user"
 )
 
@@ -27,15 +28,18 @@ func NewRouter() *gin.Engine {
 	userRepository := user.NewRepository(db)
 	notificationRepository := notification.NewRepository(db)
 	categoryRepository := category.NewRepository(db)
+	productRepository := product.NewRepository(db)
 
 	authService := auth.NewService()
 	userService := user.NewService(userRepository)
 	notificationService := notification.NewService(notificationRepository)
 	categoryService := category.NewService(categoryRepository)
+	productService := product.NewService(productRepository)
 
 	userHandler := handlers.NewUserHandler(userService, authService)
 	notificationHandler := handlers.NewNotificationHandler(notificationService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	productHandler := handlers.NewProductHandler(productService)
 
 	authMiddleware := middleware.AuthMiddleware(authService, userService)
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
@@ -65,15 +69,23 @@ func NewRouter() *gin.Engine {
 			})
 		})
 
+		// AUTH
 		api.POST("/auth/register", userHandler.Register)
 		api.POST("/auth/login", userHandler.Login)
 
+		// CATEGORY
 		api.GET("/category", authMiddleware, categoryHandler.FindAll)
 		api.GET("/category/:id", authMiddleware, categoryHandler.FindById)
 		api.POST("/category", authAdminMiddleware, categoryHandler.Create)
 		api.PUT("/category/:id", authAdminMiddleware, categoryHandler.Update)
 
+		// NOTIFICATION
 		api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
+
+		// PRODUCT
+		api.GET("/product", authMiddleware, productHandler.FindAll)
+		api.POST("/product", authAdminMiddleware, productHandler.CreateProduct)
+
 	}
 
 	return router
