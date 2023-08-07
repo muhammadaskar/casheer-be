@@ -3,7 +3,7 @@ package product
 import "time"
 
 type Service interface {
-	FindAll() ([]Product, error)
+	FindAll() ([]CustomResult, error)
 	Create(input CreateInput) (Product, error)
 }
 
@@ -15,7 +15,7 @@ func NewService(repository Repository) *service {
 	return &service{repository}
 }
 
-func (s *service) FindAll() ([]Product, error) {
+func (s *service) FindAll() ([]CustomResult, error) {
 	product, err := s.repository.FindAll()
 	if err != nil {
 		return product, err

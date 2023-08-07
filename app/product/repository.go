@@ -3,7 +3,7 @@ package product
 import "gorm.io/gorm"
 
 type Repository interface {
-	FindAll() ([]Product, error)
+	FindAll() ([]CustomResult, error)
 	Create(product Product) (Product, error)
 }
 
@@ -15,9 +15,14 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindAll() ([]Product, error) {
-	var products []Product
-	err := r.db.Preload("User").Preload("Category").Find(&products).Error
+func (r *repository) FindAll() ([]CustomResult, error) {
+	var products []CustomResult
+	query := `SELECT products.id, products.name, categories.name as category, products.price, users.name as created_by, products.entry_at, products.created_at
+	FROM products
+	LEFT JOIN users ON products.user_id = users.id
+	LEFT JOIN categories ON products.category_id = categories.id;`
+	err := r.db.Raw(query).Scan(&products).Error
+
 	if err != nil {
 		return products, err
 	}

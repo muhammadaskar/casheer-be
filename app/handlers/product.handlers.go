@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +43,6 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 
 	currentUser := c.MustGet("currentUser").(user.User)
 	input.User = currentUser
-	fmt.Println(currentUser)
 
 	newProduct, err := h.productService.Create(input)
 	if err != nil {
