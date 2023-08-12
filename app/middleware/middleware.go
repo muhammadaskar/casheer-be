@@ -6,9 +6,9 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/muhammadaskar/casheer-be/app/helper"
 	"github.com/muhammadaskar/casheer-be/app/user/usecase"
 	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
+	customresponse "github.com/muhammadaskar/casheer-be/utils/custom_response"
 )
 
 func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase) gin.HandlerFunc {
@@ -16,7 +16,7 @@ func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase
 		authHeader := ctx.GetHeader("Authorization")
 
 		if !strings.Contains(authHeader, "Bearer") {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -29,14 +29,14 @@ func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase
 
 		token, err := auth.ValidateToken(tokenString)
 		if err != nil {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 
 		claim, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -45,7 +45,7 @@ func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase
 
 		user, err := userUseCase.GetUserById(userId)
 		if err != nil {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -54,11 +54,11 @@ func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase
 
 		// if userRole != 0 || userRole != 1 {
 		// 	if userRole != user.Role {
-		// 		response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+		// 		response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 		// 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		// 		return
 		// 	}
-		// 	response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+		// 	response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 		// 	ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		// 	return
 		// }
@@ -72,7 +72,7 @@ func AuthAdminMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUs
 		authHeader := ctx.GetHeader("Authorization")
 
 		if !strings.Contains(authHeader, "Bearer") {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -85,14 +85,14 @@ func AuthAdminMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUs
 
 		token, err := auth.ValidateToken(tokenString)
 		if err != nil {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 
 		claim, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -101,7 +101,7 @@ func AuthAdminMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUs
 
 		user, err := userUseCase.GetUserById(userId)
 		if err != nil {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -109,7 +109,7 @@ func AuthAdminMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUs
 		userRole := int(claim["role"].(float64))
 
 		if userRole != 0 && userRole != user.Role {
-			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}

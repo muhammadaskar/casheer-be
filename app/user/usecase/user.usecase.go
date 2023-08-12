@@ -26,7 +26,7 @@ func NewUseCase(repository mysql.Repository) *usecase {
 	return &usecase{repository}
 }
 
-func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
+func (u *usecase) Register(input user.RegisterInput) (domains.User, error) {
 	user := domains.User{}
 
 	checkUsername := checkUsername(input.Username)
@@ -34,7 +34,7 @@ func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
 		return user, errors.New("Username is not valid.")
 	}
 
-	isUsernameAvailable, err := s.IsUsernameAvailable(input.Username)
+	isUsernameAvailable, err := u.IsUsernameAvailable(input.Username)
 	if err != nil {
 		return user, err
 	}
@@ -43,7 +43,7 @@ func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
 		return user, errors.New("Username is not available.")
 	}
 
-	isEmailAvailable, err := s.IsEmailAvailable(input.Email)
+	isEmailAvailable, err := u.IsEmailAvailable(input.Email)
 	if err != nil {
 		return user, err
 	}
@@ -66,7 +66,7 @@ func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
 	user.Role = 1
 	user.IsActive = 1
 
-	newUser, err := s.repository.Save(user)
+	newUser, err := u.repository.Save(user)
 
 	if err != nil {
 		return newUser, err
@@ -77,7 +77,7 @@ func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
 	notification.UserId = newUser.ID
 	notification.Type = 1
 
-	_, err = s.repository.CreateNotification(notification)
+	_, err = u.repository.CreateNotification(notification)
 	if err != nil {
 		return newUser, err
 	}
@@ -85,11 +85,11 @@ func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
 	return newUser, nil
 }
 
-func (s *usecase) Login(input user.LoginInput) (domains.User, error) {
+func (u *usecase) Login(input user.LoginInput) (domains.User, error) {
 	username := input.Username
 	password := input.Password
 
-	user, err := s.repository.FindByUsername(username)
+	user, err := u.repository.FindByUsername(username)
 	if err != nil {
 		return user, err
 	}

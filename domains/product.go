@@ -1,4 +1,4 @@
-package product
+package domains
 
 import (
 	"time"

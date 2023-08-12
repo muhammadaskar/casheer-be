@@ -1,6 +1,10 @@
 package product
 
-import "time"
+import (
+	"time"
+
+	"github.com/muhammadaskar/casheer-be/domains"
+)
 
 type ProductFormatter struct {
 	ID        int       `json:"id"`
@@ -10,7 +14,7 @@ type ProductFormatter struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func FormatProduct(product Product) ProductFormatter {
+func FormatProduct(product domains.Product) ProductFormatter {
 	formatter := ProductFormatter{}
 	formatter.ID = product.ID
 	formatter.Name = product.Name

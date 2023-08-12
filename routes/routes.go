@@ -9,12 +9,13 @@ import (
 	categoryDelivery "github.com/muhammadaskar/casheer-be/app/category/delivery/http"
 	categoryRepo "github.com/muhammadaskar/casheer-be/app/category/repository/mysql"
 	categoryUseCase "github.com/muhammadaskar/casheer-be/app/category/usecase"
-	"github.com/muhammadaskar/casheer-be/app/handlers"
 	"github.com/muhammadaskar/casheer-be/app/middleware"
 	notificationDelivery "github.com/muhammadaskar/casheer-be/app/notification/delivery/http"
 	notificationRepo "github.com/muhammadaskar/casheer-be/app/notification/repository/mysql"
 	notificationUseCase "github.com/muhammadaskar/casheer-be/app/notification/usecase"
-	"github.com/muhammadaskar/casheer-be/app/product"
+	productDelivery "github.com/muhammadaskar/casheer-be/app/product/delivery/http"
+	productRepo "github.com/muhammadaskar/casheer-be/app/product/repository/mysql"
+	productUseCase "github.com/muhammadaskar/casheer-be/app/product/usecase"
 	userDelivery "github.com/muhammadaskar/casheer-be/app/user/delivery/http"
 	userRepo "github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
 	userUseCase "github.com/muhammadaskar/casheer-be/app/user/usecase"
@@ -34,18 +35,18 @@ func NewRouter() *gin.Engine {
 	userRepository := userRepo.NewRepository(db)
 	notificationRepository := notificationRepo.NewRepository(db)
 	categoryRepository := categoryRepo.NewRepository(db)
-	productRepository := product.NewRepository(db)
+	productRepository := productRepo.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
 	userUseCase := userUseCase.NewUseCase(userRepository)
 	notificationUseCase := notificationUseCase.NewUseCase(notificationRepository)
 	categoryUseCase := categoryUseCase.NewUseCase(categoryRepository)
-	productService := product.NewService(productRepository)
+	productUseCase := productUseCase.NewUseCase(productRepository)
 
 	userHandler := userDelivery.NewUserHandler(userUseCase, authentication)
 	notificationHandler := notificationDelivery.NewNotificationHandler(notificationUseCase)
 	categoryHandler := categoryDelivery.NewCategoryHandler(categoryUseCase)
-	productHandler := handlers.NewProductHandler(productService)
+	productHandler := productDelivery.NewProductHandler(productUseCase)
 
 	authMiddleware := middleware.AuthMiddleware(authentication, userUseCase)
 	authAdminMiddleware := middleware.AuthAdminMiddleware(authentication, userUseCase)

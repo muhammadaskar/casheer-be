@@ -17,8 +17,8 @@ func NewUseCase(repository mysql.Repository) *usecase {
 	return &usecase{repository}
 }
 
-func (s *usecase) FindAll() ([]domains.Notification, error) {
-	notification, err := s.repository.FindAll()
+func (u *usecase) FindAll() ([]domains.Notification, error) {
+	notification, err := u.repository.FindAll()
 	if err != nil {
 		return notification, err
 	}

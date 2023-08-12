@@ -1,10 +1,13 @@
-package product
+package mysql
 
-import "gorm.io/gorm"
+import (
+	"github.com/muhammadaskar/casheer-be/domains"
+	"gorm.io/gorm"
+)
 
 type Repository interface {
-	FindAll() ([]CustomResult, error)
-	Create(product Product) (Product, error)
+	FindAll() ([]domains.CustomResult, error)
+	Create(product domains.Product) (domains.Product, error)
 }
 
 type repository struct {
@@ -15,8 +18,8 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindAll() ([]CustomResult, error) {
-	var products []CustomResult
+func (r *repository) FindAll() ([]domains.CustomResult, error) {
+	var products []domains.CustomResult
 	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, users.name as created_by, products.entry_at, products.created_at
 	FROM products
 	LEFT JOIN users ON products.user_id = users.id
@@ -30,7 +33,7 @@ func (r *repository) FindAll() ([]CustomResult, error) {
 	return products, nil
 }
 
-func (r *repository) Create(product Product) (Product, error) {
+func (r *repository) Create(product domains.Product) (domains.Product, error) {
 	err := r.db.Create(&product).Error
 	if err != nil {
 		return product, err

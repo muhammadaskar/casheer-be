@@ -23,16 +23,16 @@ func NewUseCase(repository mysql.Repository) *usecase {
 	return &usecase{repository}
 }
 
-func (s *usecase) FindAll() ([]domains.Category, error) {
-	category, err := s.repository.FindAll()
+func (u *usecase) FindAll() ([]domains.Category, error) {
+	category, err := u.repository.FindAll()
 	if err != nil {
 		return category, err
 	}
 	return category, nil
 }
 
-func (s *usecase) FindById(input category.GetCategoryInputID) (domains.Category, error) {
-	category, err := s.repository.FindById(input.ID)
+func (u *usecase) FindById(input category.GetCategoryInputID) (domains.Category, error) {
+	category, err := u.repository.FindById(input.ID)
 	if err != nil {
 		return category, err
 	}
@@ -44,11 +44,11 @@ func (s *usecase) FindById(input category.GetCategoryInputID) (domains.Category,
 	return category, nil
 }
 
-func (s *usecase) Create(input category.CreateCategoryInput) (domains.Category, error) {
+func (u *usecase) Create(input category.CreateCategoryInput) (domains.Category, error) {
 	category := domains.Category{}
 	category.Name = input.Name
 
-	newCategory, err := s.repository.Save(category)
+	newCategory, err := u.repository.Save(category)
 	if err != nil {
 		return newCategory, err
 	}
@@ -56,15 +56,15 @@ func (s *usecase) Create(input category.CreateCategoryInput) (domains.Category, 
 	return newCategory, nil
 }
 
-func (s *usecase) UpdateCategory(inputID category.GetCategoryInputID, input category.CreateCategoryInput) (domains.Category, error) {
-	category, err := s.repository.FindById(inputID.ID)
+func (u *usecase) UpdateCategory(inputID category.GetCategoryInputID, input category.CreateCategoryInput) (domains.Category, error) {
+	category, err := u.repository.FindById(inputID.ID)
 	if err != nil {
 		return category, err
 	}
 
 	category.Name = input.Name
 
-	updateCategory, err := s.repository.Update(category)
+	updateCategory, err := u.repository.Update(category)
 	if err != nil {
 		return updateCategory, err
 	}
