@@ -11,7 +11,9 @@ import (
 	categoryUseCase "github.com/muhammadaskar/casheer-be/app/category/usecase"
 	"github.com/muhammadaskar/casheer-be/app/handlers"
 	"github.com/muhammadaskar/casheer-be/app/middleware"
-	"github.com/muhammadaskar/casheer-be/app/notification"
+	notificationDelivery "github.com/muhammadaskar/casheer-be/app/notification/delivery/http"
+	notificationRepo "github.com/muhammadaskar/casheer-be/app/notification/repository/mysql"
+	notificationUseCase "github.com/muhammadaskar/casheer-be/app/notification/usecase"
 	"github.com/muhammadaskar/casheer-be/app/product"
 	userDelivery "github.com/muhammadaskar/casheer-be/app/user/delivery/http"
 	userRepo "github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
@@ -30,18 +32,18 @@ func NewRouter() *gin.Engine {
 	}
 
 	userRepository := userRepo.NewRepository(db)
-	notificationRepository := notification.NewRepository(db)
+	notificationRepository := notificationRepo.NewRepository(db)
 	categoryRepository := categoryRepo.NewRepository(db)
 	productRepository := product.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
 	userUseCase := userUseCase.NewUseCase(userRepository)
-	notificationService := notification.NewService(notificationRepository)
+	notificationUseCase := notificationUseCase.NewUseCase(notificationRepository)
 	categoryUseCase := categoryUseCase.NewUseCase(categoryRepository)
 	productService := product.NewService(productRepository)
 
 	userHandler := userDelivery.NewUserHandler(userUseCase, authentication)
-	notificationHandler := handlers.NewNotificationHandler(notificationService)
+	notificationHandler := notificationDelivery.NewNotificationHandler(notificationUseCase)
 	categoryHandler := categoryDelivery.NewCategoryHandler(categoryUseCase)
 	productHandler := handlers.NewProductHandler(productService)
 

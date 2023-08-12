@@ -1,9 +1,12 @@
-package notification
+package mysql
 
-import "gorm.io/gorm"
+import (
+	"github.com/muhammadaskar/casheer-be/domains"
+	"gorm.io/gorm"
+)
 
 type Repository interface {
-	FindAll() ([]Notification, error)
+	FindAll() ([]domains.Notification, error)
 }
 
 type repository struct {
@@ -14,8 +17,8 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindAll() ([]Notification, error) {
-	var notification []Notification
+func (r *repository) FindAll() ([]domains.Notification, error) {
+	var notification []domains.Notification
 	err := r.db.Find(&notification).Error
 	if err != nil {
 		return notification, err

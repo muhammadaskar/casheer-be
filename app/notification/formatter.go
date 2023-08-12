@@ -1,6 +1,10 @@
 package notification
 
-import "time"
+import (
+	"time"
+
+	"github.com/muhammadaskar/casheer-be/domains"
+)
 
 type NotificationFormatter struct {
 	ID        int       `json:"id"`
@@ -11,7 +15,7 @@ type NotificationFormatter struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func FormatNotification(notification Notification) NotificationFormatter {
+func FormatNotification(notification domains.Notification) NotificationFormatter {
 	notificationFormatter := NotificationFormatter{}
 	notificationFormatter.ID = notification.ID
 	notificationFormatter.Name = notification.Name
@@ -23,7 +27,7 @@ func FormatNotification(notification Notification) NotificationFormatter {
 	return notificationFormatter
 }
 
-func NotificationsFormatter(notifications []Notification) []NotificationFormatter {
+func NotificationsFormatter(notifications []domains.Notification) []NotificationFormatter {
 	notificationsFormattter := []NotificationFormatter{}
 	for _, nonotification := range notifications {
 		notificationFormattter := FormatNotification(nonotification)

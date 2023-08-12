@@ -4,7 +4,6 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/muhammadaskar/casheer-be/app/notification"
 	"github.com/muhammadaskar/casheer-be/app/user"
 	"github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
 	"github.com/muhammadaskar/casheer-be/domains"
@@ -73,7 +72,7 @@ func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
 		return newUser, err
 	}
 
-	notification := notification.Notification{}
+	notification := domains.Notification{}
 	notification.Name = newUser.Name + " baru saja melakukan registrasi"
 	notification.UserId = newUser.ID
 	notification.Type = 1
