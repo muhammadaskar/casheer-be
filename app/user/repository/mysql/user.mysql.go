@@ -1,15 +1,16 @@
-package user
+package mysql
 
 import (
 	"github.com/muhammadaskar/casheer-be/app/notification"
+	"github.com/muhammadaskar/casheer-be/domains"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	Save(user User) (User, error)
-	FindByEmail(email string) (User, error)
-	FindByUsername(username string) (User, error)
-	FindById(ID int) (User, error)
+	Save(user domains.User) (domains.User, error)
+	FindByEmail(email string) (domains.User, error)
+	FindByUsername(username string) (domains.User, error)
+	FindById(ID int) (domains.User, error)
 	CreateNotification(notification notification.Notification) (notification.Notification, error)
 }
 
@@ -21,7 +22,7 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) Save(user User) (User, error) {
+func (r *repository) Save(user domains.User) (domains.User, error) {
 	err := r.db.Create(&user).Error
 
 	if err != nil {
@@ -31,8 +32,8 @@ func (r *repository) Save(user User) (User, error) {
 	return user, nil
 }
 
-func (r *repository) FindByEmail(email string) (User, error) {
-	var user User
+func (r *repository) FindByEmail(email string) (domains.User, error) {
+	var user domains.User
 
 	err := r.db.Where("email = ?", email).Find(&user).Error
 	if err != nil {
@@ -42,8 +43,8 @@ func (r *repository) FindByEmail(email string) (User, error) {
 	return user, nil
 }
 
-func (r *repository) FindByUsername(username string) (User, error) {
-	var user User
+func (r *repository) FindByUsername(username string) (domains.User, error) {
+	var user domains.User
 
 	err := r.db.Select("id, name, username, email, password").Where("username = ?", username).First(&user).Error
 	if err != nil {
@@ -53,8 +54,8 @@ func (r *repository) FindByUsername(username string) (User, error) {
 	return user, nil
 }
 
-func (r *repository) FindById(ID int) (User, error) {
-	var user User
+func (r *repository) FindById(ID int) (domains.User, error) {
+	var user domains.User
 
 	err := r.db.Where("id = ?", ID).Find(&user).Error
 	if err != nil {

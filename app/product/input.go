@@ -1,8 +1,6 @@
 package product
 
-import (
-	"github.com/muhammadaskar/casheer-be/app/user"
-)
+import "github.com/muhammadaskar/casheer-be/domains"
 
 type CreateInput struct {
 	// UserID     int    `json:"user_id" bind:"required"`
@@ -12,5 +10,5 @@ type CreateInput struct {
 	Quantity   int    `json:"quantity" bind:"required"`
 	// Image int `json:"image" bind:"required"`
 	Description string `json:"description" bind:"required"`
-	User        user.User
+	User        domains.User
 }

@@ -6,12 +6,12 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/muhammadaskar/casheer-be/app/auth"
 	"github.com/muhammadaskar/casheer-be/app/helper"
-	"github.com/muhammadaskar/casheer-be/app/user"
+	"github.com/muhammadaskar/casheer-be/app/user/usecase"
+	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
 )
 
-func AuthMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 
@@ -27,7 +27,7 @@ func AuthMiddleware(authService auth.Service, userService user.Service) gin.Hand
 			tokenString = arrayToken[1]
 		}
 
-		token, err := authService.ValidateToken(tokenString)
+		token, err := auth.ValidateToken(tokenString)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
@@ -43,7 +43,7 @@ func AuthMiddleware(authService auth.Service, userService user.Service) gin.Hand
 
 		userId := int(claim["user_id"].(float64))
 
-		user, err := userService.GetUserById(userId)
+		user, err := userUseCase.GetUserById(userId)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
@@ -67,7 +67,7 @@ func AuthMiddleware(authService auth.Service, userService user.Service) gin.Hand
 	}
 }
 
-func AuthAdminMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+func AuthAdminMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 
@@ -83,7 +83,7 @@ func AuthAdminMiddleware(authService auth.Service, userService user.Service) gin
 			tokenString = arrayToken[1]
 		}
 
-		token, err := authService.ValidateToken(tokenString)
+		token, err := auth.ValidateToken(tokenString)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
@@ -99,7 +99,7 @@ func AuthAdminMiddleware(authService auth.Service, userService user.Service) gin
 
 		userId := int(claim["user_id"].(float64))
 
-		user, err := userService.GetUserById(userId)
+		user, err := userUseCase.GetUserById(userId)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)

@@ -6,43 +6,45 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/muhammadaskar/casheer-be/app/auth"
 	"github.com/muhammadaskar/casheer-be/app/category"
-	"github.com/muhammadaskar/casheer-be/app/config"
 	"github.com/muhammadaskar/casheer-be/app/handlers"
 	"github.com/muhammadaskar/casheer-be/app/middleware"
 	"github.com/muhammadaskar/casheer-be/app/notification"
 	"github.com/muhammadaskar/casheer-be/app/product"
-	"github.com/muhammadaskar/casheer-be/app/user"
+	"github.com/muhammadaskar/casheer-be/app/user/delivery/http"
+	"github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
+	"github.com/muhammadaskar/casheer-be/app/user/usecase"
+	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
+	"github.com/muhammadaskar/casheer-be/infrastructures/mysql_driver"
 )
 
 func NewRouter() *gin.Engine {
 	router := gin.Default()
-	db := config.InitDatabase()
+	db := mysql_driver.InitDatabase()
 
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	userRepository := user.NewRepository(db)
+	userRepository := mysql.NewRepository(db)
 	notificationRepository := notification.NewRepository(db)
 	categoryRepository := category.NewRepository(db)
 	productRepository := product.NewRepository(db)
 
-	authService := auth.NewService()
-	userService := user.NewService(userRepository)
+	authentication := auth.NewJWTAuth()
+	userUseCase := usecase.NewUseCase(userRepository)
 	notificationService := notification.NewService(notificationRepository)
 	categoryService := category.NewService(categoryRepository)
 	productService := product.NewService(productRepository)
 
-	userHandler := handlers.NewUserHandler(userService, authService)
+	userHandler := http.NewUserHandler(userUseCase, authentication)
 	notificationHandler := handlers.NewNotificationHandler(notificationService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	productHandler := handlers.NewProductHandler(productService)
 
-	authMiddleware := middleware.AuthMiddleware(authService, userService)
-	authAdminMiddleware := middleware.AuthAdminMiddleware(authService, userService)
+	authMiddleware := middleware.AuthMiddleware(authentication, userUseCase)
+	authAdminMiddleware := middleware.AuthAdminMiddleware(authentication, userUseCase)
 
 	// CORS MIDDLEWARE
 	config := cors.DefaultConfig()

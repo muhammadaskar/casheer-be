@@ -1,31 +1,34 @@
-package user
+package usecase
 
 import (
 	"errors"
 	"regexp"
 
 	"github.com/muhammadaskar/casheer-be/app/notification"
+	"github.com/muhammadaskar/casheer-be/app/user"
+	"github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
+	"github.com/muhammadaskar/casheer-be/domains"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service interface {
-	Register(input RegisterInput) (User, error)
-	Login(input LoginInput) (User, error)
+type UserUseCase interface {
+	Register(input user.RegisterInput) (domains.User, error)
+	Login(input user.LoginInput) (domains.User, error)
 	IsEmailAvailable(email string) (bool, error)
 	IsUsernameAvailable(username string) (bool, error)
-	GetUserById(ID int) (User, error)
+	GetUserById(ID int) (domains.User, error)
 }
 
-type service struct {
-	repository Repository
+type usecase struct {
+	repository mysql.Repository
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewUseCase(repository mysql.Repository) *usecase {
+	return &usecase{repository}
 }
 
-func (s *service) Register(input RegisterInput) (User, error) {
-	user := User{}
+func (s *usecase) Register(input user.RegisterInput) (domains.User, error) {
+	user := domains.User{}
 
 	checkUsername := checkUsername(input.Username)
 	if !checkUsername {
@@ -83,7 +86,7 @@ func (s *service) Register(input RegisterInput) (User, error) {
 	return newUser, nil
 }
 
-func (s *service) Login(input LoginInput) (User, error) {
+func (s *usecase) Login(input user.LoginInput) (domains.User, error) {
 	username := input.Username
 	password := input.Password
 
@@ -108,7 +111,7 @@ func (s *service) Login(input LoginInput) (User, error) {
 	return user, nil
 }
 
-func (s *service) IsEmailAvailable(email string) (bool, error) {
+func (s *usecase) IsEmailAvailable(email string) (bool, error) {
 	user, err := s.repository.FindByEmail(email)
 	if err != nil {
 		return false, err
@@ -121,7 +124,7 @@ func (s *service) IsEmailAvailable(email string) (bool, error) {
 	return false, nil
 }
 
-func (s *service) IsUsernameAvailable(username string) (bool, error) {
+func (s *usecase) IsUsernameAvailable(username string) (bool, error) {
 	user, err := s.repository.FindByUsername(username)
 	if err != nil {
 		return false, err
@@ -134,7 +137,7 @@ func (s *service) IsUsernameAvailable(username string) (bool, error) {
 	return false, nil
 }
 
-func (s *service) GetUserById(ID int) (User, error) {
+func (s *usecase) GetUserById(ID int) (domains.User, error) {
 	user, err := s.repository.FindById(ID)
 	if err != nil {
 		return user, err

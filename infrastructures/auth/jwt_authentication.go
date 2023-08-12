@@ -6,21 +6,21 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-type Service interface {
+type JWTAuthentication interface {
 	GenerateToken(userID int, email string, role int) (string, error)
 	ValidateToken(token string) (*jwt.Token, error)
 }
 
-type jwtService struct {
+type jwtAuth struct {
 }
 
 var SECRET_KEY = []byte("s3cr3T_k3Y")
 
-func NewService() *jwtService {
-	return &jwtService{}
+func NewJWTAuth() *jwtAuth {
+	return &jwtAuth{}
 }
 
-func (s *jwtService) GenerateToken(userID int, email string, role int) (string, error) {
+func (j *jwtAuth) GenerateToken(userID int, email string, role int) (string, error) {
 	claim := jwt.MapClaims{}
 	claim["user_id"] = userID
 	claim["email"] = email
@@ -36,7 +36,7 @@ func (s *jwtService) GenerateToken(userID int, email string, role int) (string, 
 	return signedToken, nil
 }
 
-func (s *jwtService) ValidateToken(encodedToken string) (*jwt.Token, error) {
+func (j *jwtAuth) ValidateToken(encodedToken string) (*jwt.Token, error) {
 	token, err := jwt.Parse(encodedToken, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 

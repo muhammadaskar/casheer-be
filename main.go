@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/muhammadaskar/casheer-be/app/routes"
+	"github.com/muhammadaskar/casheer-be/routes"
 )
 
 func main() {

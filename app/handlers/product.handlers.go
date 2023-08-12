@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/muhammadaskar/casheer-be/app/helper"
 	"github.com/muhammadaskar/casheer-be/app/product"
-	"github.com/muhammadaskar/casheer-be/app/user"
+	"github.com/muhammadaskar/casheer-be/domains"
 )
 
 type ProductHandler struct {
@@ -41,7 +41,7 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	currentUser := c.MustGet("currentUser").(user.User)
+	currentUser := c.MustGet("currentUser").(domains.User)
 	input.User = currentUser
 
 	newProduct, err := h.productService.Create(input)

@@ -17,7 +17,7 @@ func NewRepository(db *gorm.DB) *repository {
 
 func (r *repository) FindAll() ([]CustomResult, error) {
 	var products []CustomResult
-	query := `SELECT products.id, products.name, categories.name as category, products.price, users.name as created_by, products.entry_at, products.created_at
+	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, users.name as created_by, products.entry_at, products.created_at
 	FROM products
 	LEFT JOIN users ON products.user_id = users.id
 	LEFT JOIN categories ON products.category_id = categories.id;`

@@ -1,21 +1,22 @@
-package handlers
+package http
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/muhammadaskar/casheer-be/app/auth"
 	"github.com/muhammadaskar/casheer-be/app/helper"
 	"github.com/muhammadaskar/casheer-be/app/user"
+	"github.com/muhammadaskar/casheer-be/app/user/usecase"
+	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
 )
 
 type UserHandler struct {
-	userService user.Service
-	authService auth.Service
+	userUseCase usecase.UserUseCase
+	authJwt     auth.JWTAuthentication
 }
 
-func NewUserHandler(userService user.Service, authService auth.Service) *UserHandler {
-	return &UserHandler{userService, authService}
+func NewUserHandler(userUseCase usecase.UserUseCase, auth auth.JWTAuthentication) *UserHandler {
+	return &UserHandler{userUseCase, auth}
 }
 
 func (h *UserHandler) Register(c *gin.Context) {
@@ -32,7 +33,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	newUser, err := h.userService.Register(input)
+	newUser, err := h.userUseCase.Register(input)
 	if err != nil {
 		errMessage := gin.H{"errors": err.Error()}
 		response := helper.APIResponse(message, http.StatusUnprocessableEntity, "error", errMessage)
@@ -63,7 +64,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	loggedInUser, err := h.userService.Login(input)
+	loggedInUser, err := h.userUseCase.Login(input)
 	if err != nil {
 		errMessage := gin.H{"errors": err.Error()}
 		response := helper.APIResponse("Login Failed", http.StatusBadRequest, "error", errMessage)
@@ -71,7 +72,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authService.GenerateToken(loggedInUser.ID, loggedInUser.Email, loggedInUser.Role)
+	token, err := h.authJwt.GenerateToken(loggedInUser.ID, loggedInUser.Email, loggedInUser.Role)
 	if err != nil {
 		reponse := helper.APIResponse("Login failed", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, reponse)
