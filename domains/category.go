@@ -1,4 +1,4 @@
-package category
+package domains
 
 import (
 	"time"

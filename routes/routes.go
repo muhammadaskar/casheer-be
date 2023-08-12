@@ -6,14 +6,16 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/muhammadaskar/casheer-be/app/category"
+	categoryDelivery "github.com/muhammadaskar/casheer-be/app/category/delivery/http"
+	categoryRepo "github.com/muhammadaskar/casheer-be/app/category/repository/mysql"
+	categoryUseCase "github.com/muhammadaskar/casheer-be/app/category/usecase"
 	"github.com/muhammadaskar/casheer-be/app/handlers"
 	"github.com/muhammadaskar/casheer-be/app/middleware"
 	"github.com/muhammadaskar/casheer-be/app/notification"
 	"github.com/muhammadaskar/casheer-be/app/product"
-	"github.com/muhammadaskar/casheer-be/app/user/delivery/http"
-	"github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
-	"github.com/muhammadaskar/casheer-be/app/user/usecase"
+	userDelivery "github.com/muhammadaskar/casheer-be/app/user/delivery/http"
+	userRepo "github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
+	userUseCase "github.com/muhammadaskar/casheer-be/app/user/usecase"
 	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
 	"github.com/muhammadaskar/casheer-be/infrastructures/mysql_driver"
 )
@@ -27,20 +29,20 @@ func NewRouter() *gin.Engine {
 		log.Fatal("Error loading .env file")
 	}
 
-	userRepository := mysql.NewRepository(db)
+	userRepository := userRepo.NewRepository(db)
 	notificationRepository := notification.NewRepository(db)
-	categoryRepository := category.NewRepository(db)
+	categoryRepository := categoryRepo.NewRepository(db)
 	productRepository := product.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
-	userUseCase := usecase.NewUseCase(userRepository)
+	userUseCase := userUseCase.NewUseCase(userRepository)
 	notificationService := notification.NewService(notificationRepository)
-	categoryService := category.NewService(categoryRepository)
+	categoryUseCase := categoryUseCase.NewUseCase(categoryRepository)
 	productService := product.NewService(productRepository)
 
-	userHandler := http.NewUserHandler(userUseCase, authentication)
+	userHandler := userDelivery.NewUserHandler(userUseCase, authentication)
 	notificationHandler := handlers.NewNotificationHandler(notificationService)
-	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	categoryHandler := categoryDelivery.NewCategoryHandler(categoryUseCase)
 	productHandler := handlers.NewProductHandler(productService)
 
 	authMiddleware := middleware.AuthMiddleware(authentication, userUseCase)

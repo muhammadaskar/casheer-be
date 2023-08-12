@@ -1,23 +1,24 @@
-package handlers
+package http
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/muhammadaskar/casheer-be/app/category"
+	"github.com/muhammadaskar/casheer-be/app/category/usecase"
 	"github.com/muhammadaskar/casheer-be/app/helper"
 )
 
 type CategoryHandler struct {
-	categoryService category.Service
+	categoryUseCase usecase.CategoryUseCase
 }
 
-func NewCategoryHandler(categoryService category.Service) *CategoryHandler {
-	return &CategoryHandler{categoryService}
+func NewCategoryHandler(categoryUseCase usecase.CategoryUseCase) *CategoryHandler {
+	return &CategoryHandler{categoryUseCase}
 }
 
 func (h *CategoryHandler) FindAll(c *gin.Context) {
-	categories, err := h.categoryService.FindAll()
+	categories, err := h.categoryUseCase.FindAll()
 	if err != nil {
 		response := helper.APIResponse("Error to get categories", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -38,7 +39,7 @@ func (h *CategoryHandler) FindById(c *gin.Context) {
 		return
 	}
 
-	getCategory, err := h.categoryService.FindById(input)
+	getCategory, err := h.categoryUseCase.FindById(input)
 	if err != nil {
 		response := helper.APIResponse(err.Error(), http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -59,7 +60,7 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 		return
 	}
 
-	newCategory, err := h.categoryService.Create(input)
+	newCategory, err := h.categoryUseCase.Create(input)
 	if err != nil {
 		response := helper.APIResponse("Failed to create category", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -91,7 +92,7 @@ func (h *CategoryHandler) Update(c *gin.Context) {
 		return
 	}
 
-	updateCategory, err := h.categoryService.UpdateCategory(inputID, inputData)
+	updateCategory, err := h.categoryUseCase.UpdateCategory(inputID, inputData)
 	if err != nil {
 		response := helper.APIResponse("Failed to update category", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
