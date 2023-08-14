@@ -77,7 +77,7 @@ pipeline {
         }
         failure {
             // Script to be executed if the deployment fails
-            slackSend color: 'danger', message: 'Deployment failed for *prod-casheer-be* :x:. There was an issue during the deployment process.'
+            slackSend color: 'danger', message: 'Deployment failed for *dev-casheer-be* :x:. There was an issue during the deployment process.'
         }
     }
 }
