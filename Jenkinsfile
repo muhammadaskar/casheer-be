@@ -53,20 +53,27 @@ pipeline {
             }
         }
         
-        stage('Deploy') {
-            steps {
-                echo 'Running the container...'
+        // stage('Deploy') {
+        //     steps {
+        //         echo 'Running the container...'
                 
-                sh 'docker run -d --name dev-casheer-be-container -p ${SERVER_PORT_DEV}:${SERVER_PORT_DEV} --env-file .env dev-casheer-be-image:latest'
-                echo 'Container is now running.'
-                sh 'docker ps'
+        //         sh 'docker run -d --name dev-casheer-be-container -p ${SERVER_PORT_DEV}:${SERVER_PORT_DEV} --env-file .env dev-casheer-be-image:latest'
+        //         echo 'Container is now running.'
+        //         sh 'docker ps'
+        //     }
+        // }
+        stage('Deploy with Docker Compose') {
+            steps {
+                echo 'Deploying with Docker Compose...'
+                sh 'docker-compose -f docker-compose.yml up -d'
             }
         }
+
     }
     post {
         success {
             // Script to be executed if the deployment is successful
-            slackSend color: 'good', message: 'Deployment successful for *dev-casheer-be* :white_check_mark:. The application has been deployed successfully. It is now running on ${env.APP_URL}:${env.SERVER_PORT_DEV}.'
+            slackSend color: 'good', message: 'Deployment successful for *dev-casheer-be* :white_check_mark:. The application has been deployed successfully.'
         }
         failure {
             // Script to be executed if the deployment fails

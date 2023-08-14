@@ -1,23 +1,19 @@
-# Menggunakan image golang sebagai base image
+# Gunakan golang:latest sebagai base image
 FROM golang:latest
 
-# Setel working directory di dalam container
+# Setel direktori kerja ke /app di dalam container
 WORKDIR /app
 
-# Copy the .env.example file to the container
 COPY .env.example .env
 
-# Menyalin file go.mod dan go.sum ke working directory
-COPY go.mod go.sum ./
-
-# Menjalankan perintah go mod untuk mendownload dependensi
-RUN go mod download
-
-# Menyalin seluruh kode sumber ke working directory
+# Salin isi direktori saat ini ke direktori /app di dalam container
 COPY . .
 
-# Mengompilasi aplikasi Golang
+# Install dependencies (jika diperlukan)
+RUN go get -d -v ./...
+
+# Compile aplikasi Golang
 RUN go build -o main .
 
-# Menjalankan aplikasi saat container dijalankan
+# Command yang akan dijalankan ketika container dimulai
 CMD ["./main"]
