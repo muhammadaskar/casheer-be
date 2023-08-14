@@ -45,7 +45,7 @@ func (r *repository) FindByEmail(email string) (domains.User, error) {
 func (r *repository) FindByUsername(username string) (domains.User, error) {
 	var user domains.User
 
-	err := r.db.Select("id, name, username, email, password").Where("username = ?", username).First(&user).Error
+	err := r.db.Where("username = ?", username).Find(&user).Error
 	if err != nil {
 		return user, err
 	}
