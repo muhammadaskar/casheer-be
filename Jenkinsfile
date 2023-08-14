@@ -8,12 +8,10 @@ pipeline {
             }
         }
         
-        stage('Stop Container') {
+        stage('Stop Docker Compose') {
             steps {
-                echo 'Stopping the running container...'
-                sh 'docker stop dev-casheer-be-container || true'
-                sh 'docker rm dev-casheer-be-container || true'
-                echo 'Container stopped.'
+                echo 'Stopping the running compose...'
+                sh 'docker-compose down'
             }
         }
 
@@ -53,19 +51,11 @@ pipeline {
             }
         }
         
-        // stage('Deploy') {
-        //     steps {
-        //         echo 'Running the container...'
-                
-        //         sh 'docker run -d --name dev-casheer-be-container -p ${SERVER_PORT_DEV}:${SERVER_PORT_DEV} --env-file .env dev-casheer-be-image:latest'
-        //         echo 'Container is now running.'
-        //         sh 'docker ps'
-        //     }
-        // }
         stage('Deploy with Docker Compose') {
             steps {
                 echo 'Deploying with Docker Compose...'
                 sh 'docker-compose -f docker-compose.yml up -d'
+                echo 'docker ps'
             }
         }
 
