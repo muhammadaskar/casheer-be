@@ -16,7 +16,7 @@ services:
       retries: 3
 
   casheer-app:
-    image: 'casheer-be:v1.0'
+    image: 'dev-casheer-be-image:latest'
     depends_on:
       - mysql
     links:
