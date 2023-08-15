@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -14,6 +15,13 @@ type JWTAuthentication interface {
 type jwtAuth struct {
 }
 
+type customToken struct {
+	UserID int    `json:"id"`
+	Email  string `json:"email"`
+	Role   int    `json:"role"`
+	jwt.StandardClaims
+}
+
 var SECRET_KEY = []byte("s3cr3T_k3Y")
 
 func NewJWTAuth() *jwtAuth {
@@ -21,12 +29,17 @@ func NewJWTAuth() *jwtAuth {
 }
 
 func (j *jwtAuth) GenerateToken(userID int, email string, role int) (string, error) {
-	claim := jwt.MapClaims{}
-	claim["user_id"] = userID
-	claim["email"] = email
-	claim["role"] = role
+	exp := time.Now().Add(24 * time.Hour).Unix()
+	claims := &customToken{
+		UserID: userID,
+		Email:  email,
+		Role:   role,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: exp,
+		},
+	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	signedToken, err := token.SignedString(SECRET_KEY)
 	if err != nil {

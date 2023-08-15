@@ -9,7 +9,6 @@ import (
 	categoryDelivery "github.com/muhammadaskar/casheer-be/app/category/delivery/http"
 	categoryRepo "github.com/muhammadaskar/casheer-be/app/category/repository/mysql"
 	categoryUseCase "github.com/muhammadaskar/casheer-be/app/category/usecase"
-	"github.com/muhammadaskar/casheer-be/app/middleware"
 	notificationDelivery "github.com/muhammadaskar/casheer-be/app/notification/delivery/http"
 	notificationRepo "github.com/muhammadaskar/casheer-be/app/notification/repository/mysql"
 	notificationUseCase "github.com/muhammadaskar/casheer-be/app/notification/usecase"
@@ -48,8 +47,8 @@ func NewRouter() *gin.Engine {
 	categoryHandler := categoryDelivery.NewCategoryHandler(categoryUseCase)
 	productHandler := productDelivery.NewProductHandler(productUseCase)
 
-	authMiddleware := middleware.AuthMiddleware(authentication, userUseCase)
-	authAdminMiddleware := middleware.AuthAdminMiddleware(authentication, userUseCase)
+	authMiddleware := auth.AuthMiddleware(authentication, userUseCase)
+	authAdminMiddleware := auth.AuthAdminMiddleware(authentication, userUseCase)
 
 	// CORS MIDDLEWARE
 	config := cors.DefaultConfig()

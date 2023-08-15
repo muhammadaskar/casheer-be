@@ -1,4 +1,4 @@
-package middleware
+package auth
 
 import (
 	"net/http"
@@ -7,11 +7,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/muhammadaskar/casheer-be/app/user/usecase"
-	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
 	customresponse "github.com/muhammadaskar/casheer-be/utils/custom_response"
 )
 
-func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase) gin.HandlerFunc {
+func AuthMiddleware(auth JWTAuthentication, userUseCase usecase.UserUseCase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 
@@ -67,7 +66,7 @@ func AuthMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase
 	}
 }
 
-func AuthAdminMiddleware(auth auth.JWTAuthentication, userUseCase usecase.UserUseCase) gin.HandlerFunc {
+func AuthAdminMiddleware(auth JWTAuthentication, userUseCase usecase.UserUseCase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 
