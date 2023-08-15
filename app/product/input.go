@@ -2,6 +2,14 @@ package product
 
 import "github.com/muhammadaskar/casheer-be/domains"
 
+type GetProductDetailInput struct {
+	ID int `uri:"id" binding:"required"`
+}
+
+type GetProductsQueryInput struct {
+	Page int `form:"page" binding:"required"`
+}
+
 type CreateInput struct {
 	// UserID     int    `json:"user_id" bind:"required"`
 	CategoryID int    `json:"category_id" bind:"required"`

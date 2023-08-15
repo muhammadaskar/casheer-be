@@ -28,6 +28,7 @@ type CustomResult struct {
 	Name      string    `json:"name"`
 	Category  string    `json:"category"`
 	Price     float64   `json:"price"`
+	Quantity  int       `json:"quantity"`
 	CreatedBy string    `json:"created_by"`
 	EntryAt   time.Time `json:"entry_at"`
 	CreatedAt time.Time `json:"created_at"`

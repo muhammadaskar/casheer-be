@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	FindAll(page int) ([]domains.CustomResult, error)
+	FindById(id int) (domains.CustomResult, error)
 	Create(product domains.Product) (domains.Product, error)
 }
 
@@ -23,7 +24,7 @@ func (r *repository) FindAll(page int) ([]domains.CustomResult, error) {
 	offset := (page - 1) * perPage
 
 	var products []domains.CustomResult
-	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, users.name as created_by, products.entry_at, products.created_at
+	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 	FROM products
 	LEFT JOIN users ON products.user_id = users.id
 	LEFT JOIN categories ON products.category_id = categories.id
@@ -35,6 +36,21 @@ func (r *repository) FindAll(page int) ([]domains.CustomResult, error) {
 	}
 
 	return products, nil
+}
+
+func (r *repository) FindById(id int) (domains.CustomResult, error) {
+	var product domains.CustomResult
+
+	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+	FROM products
+	LEFT JOIN users ON products.user_id = users.id
+	LEFT JOIN categories ON products.category_id = categories.id
+	WHERE products.id = ?;`
+	err := r.db.Raw(query, id).Scan(&product).Error
+	if err != nil {
+		return product, err
+	}
+	return product, nil
 }
 
 func (r *repository) Create(product domains.Product) (domains.Product, error) {

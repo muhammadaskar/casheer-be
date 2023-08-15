@@ -35,14 +35,6 @@ func (j *jwtAuth) GenerateToken(userID int, email string, role int) (string, err
 	claims["email"] = email
 	claims["role"] = role
 	claims["exp"] = exp
-	// claims := &customToken{
-	// 	UserID: userID,
-	// 	Email:  email,
-	// 	Role:   role,
-	// 	StandardClaims: jwt.StandardClaims{
-	// 		ExpiresAt: exp,
-	// 	},
-	// }
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

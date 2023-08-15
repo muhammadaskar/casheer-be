@@ -19,13 +19,43 @@ func NewProductHandler(productUseCase usecase.ProductUseCase) *ProductHandler {
 }
 
 func (h *ProductHandler) FindAll(c *gin.Context) {
-	products, err := h.productUseCase.FindAll(1)
+	var query product.GetProductsQueryInput
+	// page := c.DefaultQuery("page", "1") // Mengambil query parameter "page" dari URL, default: "1"
+
+	err := c.ShouldBindQuery(&query)
+	if err != nil {
+		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := h.productUseCase.FindAll(query)
 	if err != nil {
 		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 	response := customresponse.APIResponse("List of products", http.StatusOK, "success", products)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *ProductHandler) FindById(c *gin.Context) {
+	var input product.GetProductDetailInput
+	err := c.ShouldBindUri(&input)
+	if err != nil {
+		response := customresponse.APIResponse("Error to get product", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	productDetail, err := h.productUseCase.FindById(input)
+	if err != nil {
+		response := customresponse.APIResponse("Error to get product", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Product detail", http.StatusOK, "success", productDetail)
 	c.JSON(http.StatusOK, response)
 }
 
