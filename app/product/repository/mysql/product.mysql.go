@@ -6,9 +6,12 @@ import (
 )
 
 type Repository interface {
-	FindAll(page int) ([]domains.CustomResult, error)
+	FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error)
 	FindById(id int) (domains.CustomResult, error)
+	FindByProductID(id int) (domains.Product, error)
 	Create(product domains.Product) (domains.Product, error)
+	Update(product domains.Product) (domains.Product, error)
+	Delete(id int) (domains.Product, error)
 }
 
 type repository struct {
@@ -19,22 +22,42 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindAll(page int) ([]domains.CustomResult, error) {
-	perPage := 10 // Jumlah data per halaman      // Halaman yang ingin ditampilkan
-	offset := (page - 1) * perPage
-
+func (r *repository) FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error) {
 	var products []domains.CustomResult
-	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
-	FROM products
-	LEFT JOIN users ON products.user_id = users.id
-	LEFT JOIN categories ON products.category_id = categories.id
-	LIMIT ? OFFSET ?;`
-	err := r.db.Raw(query, perPage, offset).Scan(&products).Error
 
-	if err != nil {
-		return products, err
+	if noPagination == true {
+		queryString := "%" + search + "%"
+		query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+			FROM products
+			LEFT JOIN users ON products.user_id = users.id
+			LEFT JOIN categories ON products.category_id = categories.id
+			WHERE products.name LIKE ?;`
+
+		err := r.db.Raw(query, queryString).Scan(&products).Error
+
+		if err != nil {
+			return products, err
+		}
+	} else {
+		perPage := limit
+		offset := (page - 1) * perPage
+		queryString := "%" + search + "%"
+
+		query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+				FROM products
+				LEFT JOIN users ON products.user_id = users.id
+				LEFT JOIN categories ON products.category_id = categories.id
+				WHERE products.name LIKE ?
+					LIMIT ? OFFSET ?;`
+
+		err := r.db.Raw(query, queryString, perPage, offset).Scan(&products).Error
+
+		if err != nil {
+			return products, err
+		}
+
+		return products, nil
 	}
-
 	return products, nil
 }
 
@@ -53,8 +76,37 @@ func (r *repository) FindById(id int) (domains.CustomResult, error) {
 	return product, nil
 }
 
+func (r *repository) FindByProductID(id int) (domains.Product, error) {
+	var product domains.Product
+
+	err := r.db.Where("id = ?", id).Find(&product).Error
+	if err != nil {
+		return product, err
+	}
+	return product, nil
+}
+
 func (r *repository) Create(product domains.Product) (domains.Product, error) {
 	err := r.db.Create(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (r *repository) Update(product domains.Product) (domains.Product, error) {
+	err := r.db.Save(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (r *repository) Delete(id int) (domains.Product, error) {
+	var product domains.Product
+	err := r.db.Where("id = ?", id).Delete(&product).Error
 	if err != nil {
 		return product, err
 	}

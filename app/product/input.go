@@ -7,7 +7,9 @@ type GetProductDetailInput struct {
 }
 
 type GetProductsQueryInput struct {
-	Page int `form:"page" binding:"required"`
+	Query string `form:"query"`
+	Page  int    `form:"page"`
+	Limit int    `form:"limit" binding:"required"`
 }
 
 type CreateInput struct {

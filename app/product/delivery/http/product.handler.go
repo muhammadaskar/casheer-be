@@ -84,5 +84,70 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 
 	response := customresponse.APIResponse("Success to create product", http.StatusCreated, "success", product.FormatProduct(newProduct))
 	c.JSON(http.StatusCreated, response)
+}
 
+func (h *ProductHandler) UpdateProduct(c *gin.Context) {
+	var inputID product.GetProductDetailInput
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to create product", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	var input product.CreateInput
+
+	err = c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to update product", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(domains.User)
+	input.User = currentUser
+
+	updateProduct, err := h.productUseCase.Update(inputID, input)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := customresponse.APIResponse("Failed to update product", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to update product", http.StatusCreated, "success", product.FormatProduct(updateProduct))
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *ProductHandler) DeleteProduct(c *gin.Context) {
+	var inputID product.GetProductDetailInput
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to delete product", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.productUseCase.Delete(inputID)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+
+		response := customresponse.APIResponse("Failed to delete product", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to delete product", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
 }
