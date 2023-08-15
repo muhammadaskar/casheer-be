@@ -9,7 +9,7 @@ import (
 )
 
 type ProductUseCase interface {
-	FindAll() ([]domains.CustomResult, error)
+	FindAll(page int) ([]domains.CustomResult, error)
 	Create(input product.CreateInput) (domains.Product, error)
 }
 
@@ -21,8 +21,8 @@ func NewUseCase(repository mysql.Repository) *usecase {
 	return &usecase{repository}
 }
 
-func (u *usecase) FindAll() ([]domains.CustomResult, error) {
-	product, err := u.repository.FindAll()
+func (u *usecase) FindAll(page int) ([]domains.CustomResult, error) {
+	product, err := u.repository.FindAll(page)
 	if err != nil {
 		return product, err
 	}

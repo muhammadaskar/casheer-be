@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	FindAll() ([]domains.CustomResult, error)
+	FindAll(page int) ([]domains.CustomResult, error)
 	Create(product domains.Product) (domains.Product, error)
 }
 
@@ -18,13 +18,17 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindAll() ([]domains.CustomResult, error) {
+func (r *repository) FindAll(page int) ([]domains.CustomResult, error) {
+	perPage := 10 // Jumlah data per halaman      // Halaman yang ingin ditampilkan
+	offset := (page - 1) * perPage
+
 	var products []domains.CustomResult
 	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, users.name as created_by, products.entry_at, products.created_at
 	FROM products
 	LEFT JOIN users ON products.user_id = users.id
-	LEFT JOIN categories ON products.category_id = categories.id;`
-	err := r.db.Raw(query).Scan(&products).Error
+	LEFT JOIN categories ON products.category_id = categories.id
+	LIMIT ? OFFSET ?;`
+	err := r.db.Raw(query, perPage, offset).Scan(&products).Error
 
 	if err != nil {
 		return products, err

@@ -19,7 +19,7 @@ func NewProductHandler(productUseCase usecase.ProductUseCase) *ProductHandler {
 }
 
 func (h *ProductHandler) FindAll(c *gin.Context) {
-	products, err := h.productUseCase.FindAll()
+	products, err := h.productUseCase.FindAll(1)
 	if err != nil {
 		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
