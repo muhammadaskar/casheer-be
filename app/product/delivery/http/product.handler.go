@@ -20,8 +20,6 @@ func NewProductHandler(productUseCase usecase.ProductUseCase) *ProductHandler {
 
 func (h *ProductHandler) FindAll(c *gin.Context) {
 	var query product.GetProductsQueryInput
-	// page := c.DefaultQuery("page", "1") // Mengambil query parameter "page" dari URL, default: "1"
-
 	err := c.ShouldBindQuery(&query)
 	if err != nil {
 		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
