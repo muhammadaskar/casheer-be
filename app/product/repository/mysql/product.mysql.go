@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error)
+	Count() (int64, error)
 	FindById(id int) (domains.CustomResult, error)
 	FindByProductID(id int) (domains.Product, error)
 	Create(product domains.Product) (domains.Product, error)
@@ -59,6 +60,17 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 		return products, nil
 	}
 	return products, nil
+}
+
+func (r *repository) Count() (int64, error) {
+	var products []domains.Product
+	var count int64
+
+	err := r.db.Model(&products).Count(&count).Error
+	if err != nil {
+		return count, err
+	}
+	return count, nil
 }
 
 func (r *repository) FindById(id int) (domains.CustomResult, error) {

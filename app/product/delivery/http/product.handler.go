@@ -33,7 +33,19 @@ func (h *ProductHandler) FindAll(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	response := customresponse.APIResponse("List of products", http.StatusOK, "success", products)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *ProductHandler) CountProducts(c *gin.Context) {
+	count, err := h.productUseCase.CountAll()
+	if err != nil {
+		response := customresponse.APIResponse("Error to get count products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	response := customresponse.APIResponse("Get count data products", http.StatusOK, "success", count)
 	c.JSON(http.StatusOK, response)
 }
 
