@@ -9,6 +9,9 @@ import (
 	categoryDelivery "github.com/muhammadaskar/casheer-be/app/category/delivery/http"
 	categoryRepo "github.com/muhammadaskar/casheer-be/app/category/repository/mysql"
 	categoryUseCase "github.com/muhammadaskar/casheer-be/app/category/usecase"
+	discountDelivery "github.com/muhammadaskar/casheer-be/app/discount/delivery/http"
+	discountRepo "github.com/muhammadaskar/casheer-be/app/discount/repository/mysql"
+	discountUseCase "github.com/muhammadaskar/casheer-be/app/discount/usecase"
 	notificationDelivery "github.com/muhammadaskar/casheer-be/app/notification/delivery/http"
 	notificationRepo "github.com/muhammadaskar/casheer-be/app/notification/repository/mysql"
 	notificationUseCase "github.com/muhammadaskar/casheer-be/app/notification/usecase"
@@ -35,17 +38,20 @@ func NewRouter() *gin.Engine {
 	notificationRepository := notificationRepo.NewRepository(db)
 	categoryRepository := categoryRepo.NewRepository(db)
 	productRepository := productRepo.NewRepository(db)
+	discountRepository := discountRepo.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
 	userUseCase := userUseCase.NewUseCase(userRepository)
 	notificationUseCase := notificationUseCase.NewUseCase(notificationRepository)
 	categoryUseCase := categoryUseCase.NewUseCase(categoryRepository)
 	productUseCase := productUseCase.NewUseCase(productRepository)
+	discountUseCase := discountUseCase.NewUseCase(discountRepository)
 
 	userHandler := userDelivery.NewUserHandler(userUseCase, authentication)
 	notificationHandler := notificationDelivery.NewNotificationHandler(notificationUseCase)
 	categoryHandler := categoryDelivery.NewCategoryHandler(categoryUseCase)
 	productHandler := productDelivery.NewProductHandler(productUseCase)
+	discountHandler := discountDelivery.NewDiscountHandler(discountUseCase)
 
 	authMiddleware := auth.AuthMiddleware(authentication, userUseCase)
 	authAdminMiddleware := auth.AuthAdminMiddleware(authentication, userUseCase)
@@ -96,6 +102,9 @@ func NewRouter() *gin.Engine {
 		api.PUT("/product/:id", authAdminMiddleware, productHandler.UpdateProduct)
 		api.DELETE("/product/:id", authAdminMiddleware, productHandler.DeleteProduct)
 
+		api.GET("/discount", authMiddleware, discountHandler.FindByID)
+		api.POST("/discount", authAdminMiddleware, discountHandler.Create)
+		api.PUT("/discount", authAdminMiddleware, discountHandler.Update)
 	}
 
 	return router
