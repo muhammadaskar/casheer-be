@@ -12,6 +12,9 @@ import (
 	discountDelivery "github.com/muhammadaskar/casheer-be/app/discount/delivery/http"
 	discountRepo "github.com/muhammadaskar/casheer-be/app/discount/repository/mysql"
 	discountUseCase "github.com/muhammadaskar/casheer-be/app/discount/usecase"
+	memberDelivery "github.com/muhammadaskar/casheer-be/app/member/delivery/http"
+	memberRepo "github.com/muhammadaskar/casheer-be/app/member/repository/mysql"
+	memberUseCase "github.com/muhammadaskar/casheer-be/app/member/usecase"
 	notificationDelivery "github.com/muhammadaskar/casheer-be/app/notification/delivery/http"
 	notificationRepo "github.com/muhammadaskar/casheer-be/app/notification/repository/mysql"
 	notificationUseCase "github.com/muhammadaskar/casheer-be/app/notification/usecase"
@@ -39,6 +42,7 @@ func NewRouter() *gin.Engine {
 	categoryRepository := categoryRepo.NewRepository(db)
 	productRepository := productRepo.NewRepository(db)
 	discountRepository := discountRepo.NewRepository(db)
+	memberRepository := memberRepo.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
 	userUseCase := userUseCase.NewUseCase(userRepository)
@@ -46,12 +50,14 @@ func NewRouter() *gin.Engine {
 	categoryUseCase := categoryUseCase.NewUseCase(categoryRepository)
 	productUseCase := productUseCase.NewUseCase(productRepository)
 	discountUseCase := discountUseCase.NewUseCase(discountRepository)
+	memberUseCase := memberUseCase.NewUseCase(memberRepository)
 
 	userHandler := userDelivery.NewUserHandler(userUseCase, authentication)
 	notificationHandler := notificationDelivery.NewNotificationHandler(notificationUseCase)
 	categoryHandler := categoryDelivery.NewCategoryHandler(categoryUseCase)
 	productHandler := productDelivery.NewProductHandler(productUseCase)
 	discountHandler := discountDelivery.NewDiscountHandler(discountUseCase)
+	memberHandler := memberDelivery.NewMemberHandler(memberUseCase)
 
 	authMiddleware := auth.AuthMiddleware(authentication, userUseCase)
 	authAdminMiddleware := auth.AuthAdminMiddleware(authentication, userUseCase)
@@ -105,6 +111,8 @@ func NewRouter() *gin.Engine {
 		api.GET("/discount", authMiddleware, discountHandler.FindByID)
 		api.POST("/discount", authAdminMiddleware, discountHandler.Create)
 		api.PUT("/discount", authAdminMiddleware, discountHandler.Update)
+
+		api.POST("/member", authAdminMiddleware, memberHandler.Create)
 	}
 
 	return router

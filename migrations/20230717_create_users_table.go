@@ -36,7 +36,7 @@ func main() {
 	// Membuat tabel "users"
 	// err = db.AutoMigrate(&user.User{})
 	// err = db.AutoMigrate(&category.Category{})
-	db.AutoMigrate(&domains.Discount{})
+	db.AutoMigrate(&domains.Member{})
 	// err = db.AutoMigrate(&notification.Notification{})
 	if err != nil {
 		panic("Failed to migrate database")
