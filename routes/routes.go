@@ -112,6 +112,7 @@ func NewRouter() *gin.Engine {
 		api.POST("/discount", authAdminMiddleware, discountHandler.Create)
 		api.PUT("/discount", authAdminMiddleware, discountHandler.Update)
 
+		api.GET("/member", authMiddleware, memberHandler.FindAll)
 		api.POST("/member", authAdminMiddleware, memberHandler.Create)
 	}
 

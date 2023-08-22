@@ -6,6 +6,7 @@ import (
 )
 
 type Repository interface {
+	FindAll() ([]domains.Member, error)
 	FindByMemberCode(code string) (domains.Member, error)
 	FindByPhoneNumber(number string) (domains.Member, error)
 	Create(member domains.Member) (domains.Member, error)
@@ -17,6 +18,15 @@ type repository struct {
 
 func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
+}
+
+func (r *repository) FindAll() ([]domains.Member, error) {
+	var members []domains.Member
+	err := r.db.Find(&members).Error
+	if err != nil {
+		return members, err
+	}
+	return members, nil
 }
 
 func (r *repository) FindByMemberCode(code string) (domains.Member, error) {

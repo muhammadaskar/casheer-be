@@ -18,6 +18,18 @@ func NewMemberHandler(memberUseCase usecase.MemberUseCase) *MemberHandler {
 	return &MemberHandler{memberUseCase}
 }
 
+func (h *MemberHandler) FindAll(c *gin.Context) {
+	members, err := h.memberUseCase.FindAll()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get members", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get members", http.StatusOK, "success", members)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *MemberHandler) Create(c *gin.Context) {
 	var input member.CreateInput
 

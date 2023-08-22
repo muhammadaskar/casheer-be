@@ -11,6 +11,7 @@ import (
 )
 
 type MemberUseCase interface {
+	FindAll() ([]domains.Member, error)
 	Create(input member.CreateInput) (domains.Member, error)
 }
 
@@ -20,6 +21,14 @@ type usecase struct {
 
 func NewUseCase(repository mysql.Repository) *usecase {
 	return &usecase{repository}
+}
+
+func (u *usecase) FindAll() ([]domains.Member, error) {
+	members, err := u.repository.FindAll()
+	if err != nil {
+		return members, err
+	}
+	return members, nil
 }
 
 func (u *usecase) Create(input member.CreateInput) (domains.Member, error) {
