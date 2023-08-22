@@ -42,6 +42,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 	} else {
 		perPage := limit
 		offset := (page - 1) * perPage
+		queryString := "%" + search + "%"
 
 		query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 				FROM products
@@ -50,7 +51,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 				WHERE products.name LIKE ?
 					LIMIT ? OFFSET ?;`
 
-		err := r.db.Raw(query, perPage, offset).Scan(&products).Error
+		err := r.db.Raw(query, queryString, perPage, offset).Scan(&products).Error
 
 		if err != nil {
 			return products, err
