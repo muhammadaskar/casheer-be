@@ -38,6 +38,26 @@ func (h *ProductHandler) FindAll(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *ProductHandler) GetAll(c *gin.Context) {
+	var query product.GetProductsQueryInput
+	err := c.ShouldBindQuery(&query)
+	if err != nil {
+		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := h.productUseCase.GetAll()
+	if err != nil {
+		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("List of products", http.StatusOK, "success", products)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *ProductHandler) CountProducts(c *gin.Context) {
 	count, err := h.productUseCase.CountAll()
 	if err != nil {

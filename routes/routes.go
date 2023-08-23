@@ -107,6 +107,7 @@ func NewRouter() *gin.Engine {
 		api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
 
 		// PRODUCT
+		api.GET("/products", authMiddleware, productHandler.GetAll)
 		api.GET("/product", authMiddleware, productHandler.FindAll)
 		api.GET("/product/count", authMiddleware, productHandler.CountProducts)
 		api.GET("/product/:id", authAdminMiddleware, productHandler.FindById)

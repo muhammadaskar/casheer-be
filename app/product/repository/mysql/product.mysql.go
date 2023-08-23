@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error)
+	GetAll() ([]domains.CustomProduct, error)
 	Count() (int64, error)
 	FindById(id int) (domains.CustomResult, error)
 	FindByProductID(id int) (domains.Product, error)
@@ -28,7 +29,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 
 	if noPagination == true {
 		queryString := "%" + search + "%"
-		query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+		query := `SELECT products.id, products.name, products.image, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 			FROM products
 			LEFT JOIN users ON products.user_id = users.id
 			LEFT JOIN categories ON products.category_id = categories.id
@@ -44,7 +45,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 		offset := (page - 1) * perPage
 		queryString := "%" + search + "%"
 
-		query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+		query := `SELECT products.id, products.name, products.image, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 				FROM products
 				LEFT JOIN users ON products.user_id = users.id
 				LEFT JOIN categories ON products.category_id = categories.id
@@ -59,6 +60,20 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 
 		return products, nil
 	}
+	return products, nil
+}
+
+func (r *repository) GetAll() ([]domains.CustomProduct, error) {
+	var products []domains.CustomProduct
+
+	query := `SELECT products.id, products.name, products.price, products.quantity FROM products`
+
+	err := r.db.Raw(query).Scan(&products).Error
+
+	if err != nil {
+		return products, err
+	}
+
 	return products, nil
 }
 

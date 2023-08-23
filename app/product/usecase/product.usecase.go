@@ -11,6 +11,7 @@ import (
 
 type ProductUseCase interface {
 	FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, error)
+	GetAll() ([]domains.CustomProduct, error)
 	CountAll() (int64, error)
 	FindById(input product.GetProductDetailInput) (domains.CustomResult, error)
 	Create(input product.CreateInput) (domains.Product, error)
@@ -41,6 +42,16 @@ func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.Custom
 		}
 		return product, nil
 	}
+}
+
+func (u *usecase) GetAll() ([]domains.CustomProduct, error) {
+	products, err := u.repository.GetAll()
+	if err != nil {
+		return products, err
+	}
+
+	return products, nil
+
 }
 
 func (u *usecase) CountAll() (int64, error) {
