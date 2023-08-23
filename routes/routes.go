@@ -21,6 +21,9 @@ import (
 	productDelivery "github.com/muhammadaskar/casheer-be/app/product/delivery/http"
 	productRepo "github.com/muhammadaskar/casheer-be/app/product/repository/mysql"
 	productUseCase "github.com/muhammadaskar/casheer-be/app/product/usecase"
+	transactionDelivery "github.com/muhammadaskar/casheer-be/app/transaction/delivery/http"
+	transactionRepo "github.com/muhammadaskar/casheer-be/app/transaction/repository/mysql"
+	memberUsecase "github.com/muhammadaskar/casheer-be/app/transaction/usecase"
 	userDelivery "github.com/muhammadaskar/casheer-be/app/user/delivery/http"
 	userRepo "github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
 	userUseCase "github.com/muhammadaskar/casheer-be/app/user/usecase"
@@ -43,6 +46,7 @@ func NewRouter() *gin.Engine {
 	productRepository := productRepo.NewRepository(db)
 	discountRepository := discountRepo.NewRepository(db)
 	memberRepository := memberRepo.NewRepository(db)
+	transactionRepository := transactionRepo.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
 	userUseCase := userUseCase.NewUseCase(userRepository)
@@ -51,6 +55,7 @@ func NewRouter() *gin.Engine {
 	productUseCase := productUseCase.NewUseCase(productRepository)
 	discountUseCase := discountUseCase.NewUseCase(discountRepository)
 	memberUseCase := memberUseCase.NewUseCase(memberRepository)
+	transactionUseCase := memberUsecase.NewUseCase(transactionRepository, memberRepository, productRepository, discountRepository)
 
 	userHandler := userDelivery.NewUserHandler(userUseCase, authentication)
 	notificationHandler := notificationDelivery.NewNotificationHandler(notificationUseCase)
@@ -58,6 +63,7 @@ func NewRouter() *gin.Engine {
 	productHandler := productDelivery.NewProductHandler(productUseCase)
 	discountHandler := discountDelivery.NewDiscountHandler(discountUseCase)
 	memberHandler := memberDelivery.NewMemberHandler(memberUseCase)
+	transactionHandler := transactionDelivery.NewTransactionHandler(transactionUseCase)
 
 	authMiddleware := auth.AuthMiddleware(authentication, userUseCase)
 	authAdminMiddleware := auth.AuthAdminMiddleware(authentication, userUseCase)
@@ -114,6 +120,8 @@ func NewRouter() *gin.Engine {
 
 		api.GET("/member", authMiddleware, memberHandler.FindAll)
 		api.POST("/member", authAdminMiddleware, memberHandler.Create)
+
+		api.POST("transaction", authMiddleware, transactionHandler.CreateTransaction)
 	}
 
 	return router
