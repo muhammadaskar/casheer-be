@@ -6,10 +6,14 @@ type Transacation struct {
 	ID              int
 	MemberCode      string
 	TransactionCode string
-	ProductID       int
-	Quantity        int
+	Transacations   string
 	Amount          int
 	UserID          int
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
+}
+
+type TransacationProductQuantity struct {
+	ProductID int
+	Quantity  int
 }

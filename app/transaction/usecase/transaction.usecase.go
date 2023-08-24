@@ -2,7 +2,10 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
+	"strconv"
+	"strings"
 	"time"
 
 	discountMysql "github.com/muhammadaskar/casheer-be/app/discount/repository/mysql"
@@ -35,14 +38,20 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transacation, e
 	transaction := domains.Transacation{}
 	memberCode := input.MemberCode
 	// kondisi jika member, maka akan mendapatkan discount
+	var totalAmount int
+
 	if memberCode != "" {
-		isMember, err := u.isAvailableMember(memberCode)
+		member, err := u.memberRepo.FindByMemberCode(memberCode)
 		if err != nil {
 			return transaction, err
 		}
 
-		if !isMember {
+		if member.ID == 0 {
 			return transaction, errors.New("Member code is not available")
+		}
+
+		if member.IsActive != 0 {
+			return transaction, errors.New("Member is not active")
 		}
 
 		discount, err := u.getDiscount()
@@ -53,93 +62,98 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transacation, e
 		transaction.MemberCode = input.MemberCode
 		transaction.TransactionCode = generateTransactionCode()
 
-		product, err := u.productRepo.FindByProductID(input.ProductID)
+		productQuantities, err := u.productParse(input)
 		if err != nil {
 			return transaction, err
 		}
 
-		if product.ID == 0 {
-			return transaction, errors.New("product id is not available")
+		for _, proudctQuantity := range productQuantities {
+			product, err := u.productRepo.FindByProductID(proudctQuantity.ProductID)
+			if err != nil {
+				fmt.Printf("Error finding product with ID %d: %s\n", proudctQuantity.ProductID, err)
+				continue
+			}
+
+			if product.ID == 0 {
+				return transaction, errors.New("product id is not available")
+			}
+
+			if proudctQuantity.Quantity > product.Quantity {
+				return transaction, errors.New("product quantity " + product.Name + " is not enough")
+			}
+
+			result := calculateTotalPrice(float64(product.Price), float64(discount), proudctQuantity.Quantity)
+			totalAmount += int(result)
+
+			productQuantity := product.Quantity - proudctQuantity.Quantity
+			product.Quantity = productQuantity
+
+			_, err = u.productRepo.Update(product)
+			if err != nil {
+				return transaction, err
+			}
 		}
 
-		if input.Quantity > product.Quantity {
-			return transaction, errors.New("product quantity is not enough")
-		}
-
-		transaction.ProductID = input.ProductID
-		transaction.Quantity = input.Quantity
-
-		result := calculateTotalPrice(float64(product.Price), float64(discount), input.Quantity)
-		transaction.Amount = int(result)
+		transaction.Amount = totalAmount
 		transaction.UserID = input.User.ID
-
+		transaction.Transacations = input.Transactions
 		newTransaction, err := u.transactionRepo.Create(transaction)
 		if err != nil {
 			return newTransaction, err
 		}
-
-		productQuantity := product.Quantity - input.Quantity
-		product.Quantity = productQuantity
-
-		_, err = u.productRepo.Update(product)
-		if err != nil {
-			return newTransaction, err
-		}
-
 		return newTransaction, nil
+
 	} else {
 		// kondisi jika bukan member, maka tidak akan mendapatkan discount
 		transaction.MemberCode = input.MemberCode
 		transaction.TransactionCode = generateTransactionCode()
 
-		product, err := u.productRepo.FindByProductID(input.ProductID)
+		// productQuantities := parseInput(input.Transactions)
+		productQuantities, err := u.productParse(input)
 		if err != nil {
 			return transaction, err
 		}
 
-		if product.ID == 0 {
-			return transaction, errors.New("product id is not available")
+		for _, proudctQuantity := range productQuantities {
+			product, err := u.productRepo.FindByProductID(proudctQuantity.ProductID)
+			if err != nil {
+				fmt.Printf("Error finding product with ID %d: %s\n", proudctQuantity.ProductID, err)
+				continue
+			}
+
+			if err != nil {
+				return transaction, err
+			}
+			if product.ID == 0 {
+				return transaction, errors.New("product id is not available")
+			}
+
+			if proudctQuantity.Quantity > product.Quantity {
+				return transaction, errors.New("product quantity " + product.Name + " is not enough")
+			}
+
+			result := (product.Price * proudctQuantity.Quantity)
+			totalAmount += result
+
+			productQuantity := product.Quantity - proudctQuantity.Quantity
+			product.Quantity = productQuantity
+
+			_, err = u.productRepo.Update(product)
+			if err != nil {
+				return transaction, err
+			}
 		}
 
-		if input.Quantity > product.Quantity {
-			return transaction, errors.New("product quantity is not enough")
-		}
-
-		transaction.ProductID = input.ProductID
-		transaction.Quantity = input.Quantity
-
-		result := (product.Price * input.Quantity)
-		transaction.Amount = result
+		transaction.Amount = totalAmount
 		transaction.UserID = input.User.ID
+		transaction.Transacations = input.Transactions
 
 		newTransaction, err := u.transactionRepo.Create(transaction)
 		if err != nil {
 			return newTransaction, err
 		}
-
-		productQuantity := product.Quantity - input.Quantity
-		product.Quantity = productQuantity
-
-		_, err = u.productRepo.Update(product)
-		if err != nil {
-			return newTransaction, err
-		}
-
 		return newTransaction, nil
 	}
-}
-
-func (u *usecase) isAvailableMember(memberCode string) (bool, error) {
-	member, err := u.memberRepo.FindByMemberCode(memberCode)
-	if err != nil {
-		return false, err
-	}
-
-	if member.ID != 0 {
-		return true, nil
-	}
-
-	return false, nil
 }
 
 func (u *usecase) getDiscount() (int, error) {
@@ -183,4 +197,55 @@ func calculateTotalPrice(originalPrice float64, discountPercentage float64, quan
 	discountAmount := (discountPercentage / 100) * totalOriginalPrice
 	totalPriceAfterDiscount := totalOriginalPrice - discountAmount
 	return totalPriceAfterDiscount
+}
+
+type Transaction struct {
+	ProductID int
+	Quantity  int
+}
+
+func parseInput(input string) []Transaction {
+	input = strings.Trim(input, "{}")     // Remove outer curly braces
+	pairs := strings.Split(input, "}, {") // Split into individual pairs
+
+	var transactions []Transaction
+
+	for _, pair := range pairs {
+		parts := strings.Split(pair, ",")
+		if len(parts) != 2 {
+			continue
+		}
+
+		productID, err1 := strconv.Atoi(strings.TrimSpace(parts[0]))
+		quantity, err2 := strconv.Atoi(strings.TrimSpace(parts[1]))
+
+		if err1 == nil && err2 == nil {
+			transactions = append(transactions, Transaction{ProductID: productID, Quantity: quantity})
+		}
+	}
+
+	return transactions
+}
+
+func (u *usecase) productParse(input transaction.CreateInput) ([]Transaction, error) {
+	productQuantities := parseInput(input.Transactions)
+	for _, proudctQuantity := range productQuantities {
+		product, err := u.productRepo.FindByProductID(proudctQuantity.ProductID)
+		if err != nil {
+			fmt.Printf("Error finding product with ID %d: %s\n", proudctQuantity.ProductID, err)
+			continue
+		}
+
+		if err != nil {
+			return productQuantities, err
+		}
+		if product.ID == 0 {
+			return productQuantities, errors.New("product id is not available")
+		}
+
+		if proudctQuantity.Quantity > product.Quantity {
+			return productQuantities, errors.New("product quantity " + product.Name + " is not enough")
+		}
+	}
+	return productQuantities, nil
 }
