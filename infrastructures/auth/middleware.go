@@ -28,7 +28,8 @@ func AuthMiddleware(auth JWTAuthentication, userUseCase usecase.UserUseCase) gin
 
 		token, err := auth.ValidateToken(tokenString)
 		if err != nil {
-			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			errorMessage := gin.H{"error": err.Error()}
+			response := customresponse.APIResponse("Unauthorized", http.StatusUnauthorized, "error", errorMessage)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
