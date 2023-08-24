@@ -12,30 +12,30 @@ import (
 	memberMysql "github.com/muhammadaskar/casheer-be/app/member/repository/mysql"
 	productMysql "github.com/muhammadaskar/casheer-be/app/product/repository/mysql"
 	"github.com/muhammadaskar/casheer-be/app/transaction"
-	transacationMysql "github.com/muhammadaskar/casheer-be/app/transaction/repository/mysql"
+	transactionMysql "github.com/muhammadaskar/casheer-be/app/transaction/repository/mysql"
 	"github.com/muhammadaskar/casheer-be/domains"
 )
 
-type TransacationUseCase interface {
-	Create(input transaction.CreateInput) (domains.Transacation, error)
+type TransactionUseCase interface {
+	Create(input transaction.CreateInput) (domains.Transaction, error)
 }
 
 type usecase struct {
-	transactionRepo transacationMysql.Repository
+	transactionRepo transactionMysql.Repository
 	memberRepo      memberMysql.Repository
 	productRepo     productMysql.Repository
 	discountRepo    discountMysql.Repository
 }
 
-func NewUseCase(transactionRepo transacationMysql.Repository,
+func NewUseCase(transactionRepo transactionMysql.Repository,
 	memberRepo memberMysql.Repository,
 	productRepo productMysql.Repository,
 	discountRepo discountMysql.Repository) *usecase {
 	return &usecase{transactionRepo, memberRepo, productRepo, discountRepo}
 }
 
-func (u *usecase) Create(input transaction.CreateInput) (domains.Transacation, error) {
-	transaction := domains.Transacation{}
+func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, error) {
+	transaction := domains.Transaction{}
 	memberCode := input.MemberCode
 	// kondisi jika member, maka akan mendapatkan discount
 	var totalAmount int
@@ -96,7 +96,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transacation, e
 
 		transaction.Amount = totalAmount
 		transaction.UserID = input.User.ID
-		transaction.Transacations = input.Transactions
+		transaction.Transactions = input.Transactions
 		newTransaction, err := u.transactionRepo.Create(transaction)
 		if err != nil {
 			return newTransaction, err
@@ -146,7 +146,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transacation, e
 
 		transaction.Amount = totalAmount
 		transaction.UserID = input.User.ID
-		transaction.Transacations = input.Transactions
+		transaction.Transactions = input.Transactions
 
 		newTransaction, err := u.transactionRepo.Create(transaction)
 		if err != nil {
@@ -163,19 +163,6 @@ func (u *usecase) getDiscount() (int, error) {
 	}
 
 	return discount.Discount, nil
-}
-
-func (u *usecase) getProduct(id int) (int, error) {
-	product, err := u.productRepo.FindByProductID(id)
-	if err != nil {
-		return 0, err
-	}
-
-	if product.ID != 0 {
-		return product.ID, nil
-	}
-
-	return 0, nil
 }
 
 func generateTransactionCode() string {

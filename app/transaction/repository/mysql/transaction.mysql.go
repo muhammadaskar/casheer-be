@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	Create(transaction domains.Transacation) (domains.Transacation, error)
+	Create(transaction domains.Transaction) (domains.Transaction, error)
 }
 
 type repository struct {
@@ -17,10 +17,10 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) Create(transacation domains.Transacation) (domains.Transacation, error) {
-	err := r.db.Create(&transacation).Error
+func (r *repository) Create(transaction domains.Transaction) (domains.Transaction, error) {
+	err := r.db.Create(&transaction).Error
 	if err != nil {
-		return transacation, err
+		return transaction, err
 	}
-	return transacation, nil
+	return transaction, nil
 }

@@ -2,18 +2,18 @@ package domains
 
 import "time"
 
-type Transacation struct {
+type Transaction struct {
 	ID              int
 	MemberCode      string
 	TransactionCode string
-	Transacations   string
+	Transactions    string
 	Amount          int
 	UserID          int
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }
 
-type TransacationProductQuantity struct {
+type TransactionProductQuantity struct {
 	ProductID int
 	Quantity  int
 }

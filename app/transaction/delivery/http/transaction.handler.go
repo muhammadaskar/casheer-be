@@ -11,10 +11,10 @@ import (
 )
 
 type TransactionHandler struct {
-	transactionUseCase usecase.TransacationUseCase
+	transactionUseCase usecase.TransactionUseCase
 }
 
-func NewTransactionHandler(transactionUseCase usecase.TransacationUseCase) *TransactionHandler {
+func NewTransactionHandler(transactionUseCase usecase.TransactionUseCase) *TransactionHandler {
 	return &TransactionHandler{transactionUseCase}
 }
 
