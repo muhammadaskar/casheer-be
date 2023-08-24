@@ -24,14 +24,15 @@ type Product struct {
 }
 
 type CustomResult struct {
-	ID        uint      `json:"id"`
-	Name      string    `json:"name"`
-	Category  string    `json:"category"`
-	Price     float64   `json:"price"`
-	Quantity  int       `json:"quantity"`
-	CreatedBy string    `json:"created_by"`
-	EntryAt   time.Time `json:"entry_at"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         uint      `json:"id"`
+	CategoryID int       `json:"category_id"`
+	Name       string    `json:"name"`
+	Category   string    `json:"category"`
+	Price      float64   `json:"price"`
+	Quantity   int       `json:"quantity"`
+	CreatedBy  string    `json:"created_by"`
+	EntryAt    time.Time `json:"entry_at"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type CustomProduct struct {

@@ -29,7 +29,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 
 	if noPagination == true {
 		queryString := "%" + search + "%"
-		query := `SELECT products.id, products.name, products.image, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+		query := `SELECT products.id, categories.id as category_id, products.name, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 			FROM products
 			LEFT JOIN users ON products.user_id = users.id
 			LEFT JOIN categories ON products.category_id = categories.id
@@ -45,7 +45,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 		offset := (page - 1) * perPage
 		queryString := "%" + search + "%"
 
-		query := `SELECT products.id, products.name, products.image, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+		query := `SELECT products.id, products.name, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 				FROM products
 				LEFT JOIN users ON products.user_id = users.id
 				LEFT JOIN categories ON products.category_id = categories.id
