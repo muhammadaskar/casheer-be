@@ -18,6 +18,18 @@ func NewTransactionHandler(transactionUseCase usecase.TransactionUseCase) *Trans
 	return &TransactionHandler{transactionUseCase}
 }
 
+func (h *TransactionHandler) FindAll(c *gin.Context) {
+	transactions, err := h.transactionUseCase.FindAll()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get transactions", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get transactions", http.StatusOK, "success", transactions)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	var input transaction.CreateInput
 

@@ -122,7 +122,8 @@ func NewRouter() *gin.Engine {
 		api.GET("/member", authMiddleware, memberHandler.FindAll)
 		api.POST("/member", authAdminMiddleware, memberHandler.Create)
 
-		api.POST("transaction", authMiddleware, transactionHandler.CreateTransaction)
+		api.GET("/transaction", authMiddleware, transactionHandler.FindAll)
+		api.POST("/transaction", authMiddleware, transactionHandler.CreateTransaction)
 	}
 
 	return router
