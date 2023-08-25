@@ -37,7 +37,6 @@ func NewUseCase(transactionRepo transactionMysql.Repository,
 func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, error) {
 	transaction := domains.Transaction{}
 	memberCode := input.MemberCode
-	// kondisi jika member, maka akan mendapatkan discount
 	var totalAmount int
 
 	if memberCode != "" {
@@ -54,7 +53,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			return transaction, errors.New("Member is not active")
 		}
 
-		discount, err := u.getDiscount()
+		discount, err := u.discountRepo.FindById()
 		if err != nil {
 			return transaction, err
 		}
@@ -79,10 +78,10 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			}
 
 			if proudctQuantity.Quantity > product.Quantity {
-				return transaction, errors.New("product quantity " + product.Name + " is not enough")
+				return transaction, errors.New("Product quantity " + product.Name + " is not enough")
 			}
 
-			result := calculateTotalPrice(float64(product.Price), float64(discount), proudctQuantity.Quantity)
+			result := calculateTotalPrice(float64(product.Price), float64(discount.Discount), proudctQuantity.Quantity)
 			totalAmount += int(result)
 
 			productQuantity := product.Quantity - proudctQuantity.Quantity
@@ -129,7 +128,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			}
 
 			if proudctQuantity.Quantity > product.Quantity {
-				return transaction, errors.New("product quantity " + product.Name + " is not enough")
+				return transaction, errors.New("Product quantity " + product.Name + " is not enough")
 			}
 
 			result := (product.Price * proudctQuantity.Quantity)
@@ -156,15 +155,6 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 	}
 }
 
-func (u *usecase) getDiscount() (int, error) {
-	discount, err := u.discountRepo.FindById()
-	if err != nil {
-		return discount.Discount, err
-	}
-
-	return discount.Discount, nil
-}
-
 func generateTransactionCode() string {
 	rand.Seed(time.Now().UnixNano())
 	length := 16
@@ -186,16 +176,11 @@ func calculateTotalPrice(originalPrice float64, discountPercentage float64, quan
 	return totalPriceAfterDiscount
 }
 
-type Transaction struct {
-	ProductID int
-	Quantity  int
-}
-
-func parseInput(input string) []Transaction {
+func parseInput(input string) []domains.TransactionProductQuantity {
 	input = strings.Trim(input, "{}")     // Remove outer curly braces
 	pairs := strings.Split(input, "}, {") // Split into individual pairs
 
-	var transactions []Transaction
+	var transactions []domains.TransactionProductQuantity
 
 	for _, pair := range pairs {
 		parts := strings.Split(pair, ",")
@@ -207,14 +192,14 @@ func parseInput(input string) []Transaction {
 		quantity, err2 := strconv.Atoi(strings.TrimSpace(parts[1]))
 
 		if err1 == nil && err2 == nil {
-			transactions = append(transactions, Transaction{ProductID: productID, Quantity: quantity})
+			transactions = append(transactions, domains.TransactionProductQuantity{ProductID: productID, Quantity: quantity})
 		}
 	}
 
 	return transactions
 }
 
-func (u *usecase) productParse(input transaction.CreateInput) ([]Transaction, error) {
+func (u *usecase) productParse(input transaction.CreateInput) ([]domains.TransactionProductQuantity, error) {
 	productQuantities := parseInput(input.Transactions)
 	for _, proudctQuantity := range productQuantities {
 		product, err := u.productRepo.FindByProductID(proudctQuantity.ProductID)
