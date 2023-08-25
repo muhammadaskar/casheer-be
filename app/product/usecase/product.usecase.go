@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"math"
 	"time"
 
 	"github.com/muhammadaskar/casheer-be/app/product"
@@ -29,17 +30,32 @@ func NewUseCase(repository mysql.Repository) *usecase {
 
 func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error) {
 	if query.Query != "" {
-		product, isLastPage, err := u.repository.FindAll(query.Query, query.Page, query.Limit, true)
+		product, err := u.repository.FindAll(query.Query, query.Page, query.Limit, true)
 		if err != nil {
-			return product, isLastPage, err
+			return product, true, err
 		}
 
-		return product, isLastPage, nil
+		return product, true, nil
 	} else {
-		product, isLastPage, err := u.repository.FindAll(query.Query, query.Page, query.Limit, false)
+		product, err := u.repository.FindAll(query.Query, query.Page, query.Limit, false)
 		if err != nil {
-			return product, isLastPage, err
+			return product, true, err
 		}
+		totalCount, err := u.CountAll()
+		if err != nil {
+			return product, true, err
+		}
+
+		perPage := query.Limit
+		offset := (query.Page - 1) * perPage
+		totalPages := int(math.Ceil(float64(totalCount) / float64(perPage)))
+
+		// Hitung nomor halaman saat ini berdasarkan offset dan produk per halaman
+		currentPage := (offset / perPage) + 1
+
+		// Periksa apakah Anda berada di halaman terakhir
+		isLastPage := currentPage == totalPages
+
 		return product, isLastPage, nil
 	}
 }
