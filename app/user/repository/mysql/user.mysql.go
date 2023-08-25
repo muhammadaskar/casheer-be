@@ -10,7 +10,6 @@ type Repository interface {
 	FindByEmail(email string) (domains.User, error)
 	FindByUsername(username string) (domains.User, error)
 	FindById(ID int) (domains.User, error)
-	CreateNotification(notification domains.Notification) (domains.Notification, error)
 }
 
 type repository struct {
@@ -62,13 +61,4 @@ func (r *repository) FindById(ID int) (domains.User, error) {
 	}
 
 	return user, nil
-}
-
-func (r *repository) CreateNotification(notification domains.Notification) (domains.Notification, error) {
-	err := r.db.Create(&notification).Error
-	if err != nil {
-		return notification, err
-	}
-
-	return notification, nil
 }

@@ -12,6 +12,7 @@ type NotificationFormatter struct {
 	Type      int       `json:"type"`
 	UserId    int       `json:"user_id"`
 	ProductId int       `json:"product_id"`
+	IsRead    int       `json:"is_read"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -22,6 +23,7 @@ func FormatNotification(notification domains.Notification) NotificationFormatter
 	notificationFormatter.Type = notification.Type
 	notificationFormatter.UserId = notification.UserId
 	notificationFormatter.ProductId = notification.ProductId
+	notificationFormatter.IsRead = notification.IsRead
 	notificationFormatter.CreatedAt = notification.CreatedAt
 
 	return notificationFormatter

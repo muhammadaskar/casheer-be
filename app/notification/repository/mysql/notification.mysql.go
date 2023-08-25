@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	FindAll() ([]domains.Notification, error)
+	CreateNotification(notification domains.Notification) (domains.Notification, error)
 }
 
 type repository struct {
@@ -20,6 +21,15 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) FindAll() ([]domains.Notification, error) {
 	var notification []domains.Notification
 	err := r.db.Find(&notification).Error
+	if err != nil {
+		return notification, err
+	}
+
+	return notification, nil
+}
+
+func (r *repository) CreateNotification(notification domains.Notification) (domains.Notification, error) {
+	err := r.db.Create(&notification).Error
 	if err != nil {
 		return notification, err
 	}

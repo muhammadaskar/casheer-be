@@ -12,6 +12,7 @@ type Notification struct {
 	Type      int
 	UserId    int
 	ProductId int
+	IsRead    int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	// User      user.User

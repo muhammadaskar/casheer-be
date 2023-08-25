@@ -49,7 +49,7 @@ func NewRouter() *gin.Engine {
 	transactionRepository := transactionRepo.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
-	userUseCase := userUseCase.NewUseCase(userRepository)
+	userUseCase := userUseCase.NewUseCase(userRepository, notificationRepository)
 	notificationUseCase := notificationUseCase.NewUseCase(notificationRepository)
 	categoryUseCase := categoryUseCase.NewUseCase(categoryRepository)
 	productUseCase := productUseCase.NewUseCase(productRepository)

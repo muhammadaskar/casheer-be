@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 
+	notificationRepo "github.com/muhammadaskar/casheer-be/app/notification/repository/mysql"
 	"github.com/muhammadaskar/casheer-be/app/user"
 	"github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
 	"github.com/muhammadaskar/casheer-be/domains"
@@ -19,11 +20,12 @@ type UserUseCase interface {
 }
 
 type usecase struct {
-	repository mysql.Repository
+	userRepository         mysql.Repository
+	notificationRepository notificationRepo.Repository
 }
 
-func NewUseCase(repository mysql.Repository) *usecase {
-	return &usecase{repository}
+func NewUseCase(userRepository mysql.Repository, notificationRepository notificationRepo.Repository) *usecase {
+	return &usecase{userRepository, notificationRepository}
 }
 
 func (u *usecase) Register(input user.RegisterInput) (domains.User, error) {
@@ -66,7 +68,7 @@ func (u *usecase) Register(input user.RegisterInput) (domains.User, error) {
 	user.Role = 1
 	user.IsActive = 1
 
-	newUser, err := u.repository.Save(user)
+	newUser, err := u.userRepository.Save(user)
 
 	if err != nil {
 		return newUser, err
@@ -76,8 +78,9 @@ func (u *usecase) Register(input user.RegisterInput) (domains.User, error) {
 	notification.Name = newUser.Name + " baru saja melakukan registrasi"
 	notification.UserId = newUser.ID
 	notification.Type = 1
+	notification.IsRead = 1
 
-	_, err = u.repository.CreateNotification(notification)
+	_, err = u.notificationRepository.CreateNotification(notification)
 	if err != nil {
 		return newUser, err
 	}
@@ -89,7 +92,7 @@ func (u *usecase) Login(input user.LoginInput) (domains.User, error) {
 	username := input.Username
 	password := input.Password
 
-	user, err := u.repository.FindByUsername(username)
+	user, err := u.userRepository.FindByUsername(username)
 	if err != nil {
 		return user, err
 	}
@@ -111,7 +114,7 @@ func (u *usecase) Login(input user.LoginInput) (domains.User, error) {
 }
 
 func (s *usecase) IsEmailAvailable(email string) (bool, error) {
-	user, err := s.repository.FindByEmail(email)
+	user, err := s.userRepository.FindByEmail(email)
 	if err != nil {
 		return false, err
 	}
@@ -124,7 +127,7 @@ func (s *usecase) IsEmailAvailable(email string) (bool, error) {
 }
 
 func (s *usecase) IsUsernameAvailable(username string) (bool, error) {
-	user, err := s.repository.FindByUsername(username)
+	user, err := s.userRepository.FindByUsername(username)
 	if err != nil {
 		return false, err
 	}
@@ -137,7 +140,7 @@ func (s *usecase) IsUsernameAvailable(username string) (bool, error) {
 }
 
 func (s *usecase) GetUserById(ID int) (domains.User, error) {
-	user, err := s.repository.FindById(ID)
+	user, err := s.userRepository.FindById(ID)
 	if err != nil {
 		return user, err
 	}
