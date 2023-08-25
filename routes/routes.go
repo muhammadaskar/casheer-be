@@ -105,6 +105,7 @@ func NewRouter() *gin.Engine {
 
 		// NOTIFICATION
 		api.GET("/notification", authAdminMiddleware, notificationHandler.FindAll)
+		api.PUT("/notification/:id", authAdminMiddleware, notificationHandler.Update)
 
 		// PRODUCT
 		api.GET("/products", authMiddleware, productHandler.GetAll)
