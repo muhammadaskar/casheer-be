@@ -10,7 +10,7 @@ import (
 )
 
 type ProductUseCase interface {
-	FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, error)
+	FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error)
 	GetAll() ([]domains.CustomProduct, error)
 	CountAll() (int64, error)
 	FindById(input product.GetProductDetailInput) (domains.CustomResult, error)
@@ -27,20 +27,20 @@ func NewUseCase(repository mysql.Repository) *usecase {
 	return &usecase{repository}
 }
 
-func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, error) {
+func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error) {
 	if query.Query != "" {
-		product, err := u.repository.FindAll(query.Query, query.Page, query.Limit, true)
+		product, isLastPage, err := u.repository.FindAll(query.Query, query.Page, query.Limit, true)
 		if err != nil {
-			return product, err
+			return product, isLastPage, err
 		}
 
-		return product, nil
+		return product, isLastPage, nil
 	} else {
-		product, err := u.repository.FindAll(query.Query, query.Page, query.Limit, false)
+		product, isLastPage, err := u.repository.FindAll(query.Query, query.Page, query.Limit, false)
 		if err != nil {
-			return product, err
+			return product, isLastPage, err
 		}
-		return product, nil
+		return product, isLastPage, nil
 	}
 }
 

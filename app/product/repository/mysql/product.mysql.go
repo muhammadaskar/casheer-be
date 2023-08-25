@@ -1,12 +1,14 @@
 package mysql
 
 import (
+	"math"
+
 	"github.com/muhammadaskar/casheer-be/domains"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error)
+	FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, bool, error)
 	GetAll() ([]domains.CustomProduct, error)
 	Count() (int64, error)
 	FindById(id int) (domains.CustomResult, error)
@@ -24,7 +26,7 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error) {
+func (r *repository) FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, bool, error) {
 	var products []domains.CustomResult
 
 	if noPagination == true {
@@ -38,29 +40,44 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 		err := r.db.Raw(query, queryString).Scan(&products).Error
 
 		if err != nil {
-			return products, err
+			return products, false, err
 		}
 	} else {
 		perPage := limit
 		offset := (page - 1) * perPage
-		queryString := "%" + search + "%"
+
+		// Menghitung total data yang cocok dengan kriteria pencarian
+		var totalCount int
+		totalCountQuery := `SELECT COUNT(*) FROM products`
+		err := r.db.Raw(totalCountQuery).Scan(&totalCount).Error
+		if err != nil {
+			return products, false, err
+		}
 
 		query := `SELECT products.id, products.name, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 				FROM products
 				LEFT JOIN users ON products.user_id = users.id
 				LEFT JOIN categories ON products.category_id = categories.id
-				WHERE products.name LIKE ?
 					LIMIT ? OFFSET ?;`
 
-		err := r.db.Raw(query, queryString, perPage, offset).Scan(&products).Error
+		err = r.db.Raw(query, perPage, offset).Scan(&products).Error
 
 		if err != nil {
-			return products, err
+			return products, false, err
 		}
 
-		return products, nil
+		// Hitung total jumlah halaman berdasarkan total produk dan produk per halaman
+		totalPages := int(math.Ceil(float64(totalCount) / float64(perPage)))
+
+		// Hitung nomor halaman saat ini berdasarkan offset dan produk per halaman
+		currentPage := (offset / perPage) + 1
+
+		// Periksa apakah Anda berada di halaman terakhir
+		isLastPage := currentPage == totalPages
+
+		return products, isLastPage, nil
 	}
-	return products, nil
+	return products, true, nil
 }
 
 func (r *repository) GetAll() ([]domains.CustomProduct, error) {

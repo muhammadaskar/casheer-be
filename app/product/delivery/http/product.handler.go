@@ -27,14 +27,19 @@ func (h *ProductHandler) FindAll(c *gin.Context) {
 		return
 	}
 
-	products, err := h.productUseCase.FindAll(query)
+	products, isLastPage, err := h.productUseCase.FindAll(query)
 	if err != nil {
 		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := customresponse.APIResponse("List of products", http.StatusOK, "success", products)
+	data := gin.H{
+		"is_last_page": isLastPage,
+		"products":     products,
+	}
+
+	response := customresponse.APIResponse("List of products", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
 }
 
