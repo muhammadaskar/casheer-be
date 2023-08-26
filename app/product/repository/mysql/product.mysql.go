@@ -13,7 +13,6 @@ type Repository interface {
 	FindByProductID(id int) (domains.Product, error)
 	Create(product domains.Product) (domains.Product, error)
 	Update(product domains.Product) (domains.Product, error)
-	Delete(id int) (domains.Product, error)
 }
 
 type repository struct {
@@ -64,7 +63,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 func (r *repository) GetAll() ([]domains.CustomProduct, error) {
 	var products []domains.CustomProduct
 
-	query := `SELECT products.id, products.name, products.price, products.quantity FROM products`
+	query := `SELECT products.id, products.name, products.price, products.quantity FROM products WHERE is_deleted = 1`
 
 	err := r.db.Raw(query).Scan(&products).Error
 
@@ -122,16 +121,6 @@ func (r *repository) Create(product domains.Product) (domains.Product, error) {
 
 func (r *repository) Update(product domains.Product) (domains.Product, error) {
 	err := r.db.Save(&product).Error
-	if err != nil {
-		return product, err
-	}
-
-	return product, nil
-}
-
-func (r *repository) Delete(id int) (domains.Product, error) {
-	var product domains.Product
-	err := r.db.Where("id = ?", id).Delete(&product).Error
 	if err != nil {
 		return product, err
 	}

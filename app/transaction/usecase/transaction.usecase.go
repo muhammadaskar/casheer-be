@@ -105,7 +105,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 				continue
 			}
 
-			if product.ID == 0 {
+			if product.ID == 0 || product.IsDeleted == 0 {
 				return transaction, errors.New("product id is not available")
 			}
 
@@ -155,7 +155,8 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			if err != nil {
 				return transaction, err
 			}
-			if product.ID == 0 {
+
+			if product.ID == 0 || product.IsDeleted == 0 {
 				return transaction, errors.New("product id is not available")
 			}
 

@@ -102,6 +102,7 @@ func (u *usecase) Create(input product.CreateInput) (domains.Product, error) {
 
 	product.Image = "https://img-global.cpcdn.com/recipes/93a46a53e22256b8/680x482cq70/songkolo-bagadang-ketan-serundeng-foto-resep-utama.jpg"
 	product.EntryAt = today
+	product.IsDeleted = 1
 	// product.ExpiredAt = input.ExpiredAt
 
 	newProduct, err := u.repository.Create(product)
@@ -156,7 +157,13 @@ func (u *usecase) Delete(input product.GetProductDetailInput) (domains.Product, 
 		return product, errors.New("No product on that ID")
 	}
 
-	deleteProduct, err := u.repository.Delete(input.ID)
+	if product.IsDeleted == 0 {
+		return product, errors.New("The product has been previously removed")
+	}
+
+	product.IsDeleted = 0
+
+	deleteProduct, err := u.repository.Update(product)
 	if err != nil {
 		return deleteProduct, err
 	}

@@ -15,6 +15,7 @@ type Product struct {
 	Quantity    int
 	Image       string
 	Description string
+	IsDeleted   int
 	EntryAt     time.Time
 	ExpiredAt   *time.Time
 	CreatedAt   time.Time
