@@ -28,3 +28,15 @@ type CustomTransaction struct {
 	Name            string    `json:"casheer_name"`
 	CreatedAt       time.Time `json:"created_at"`
 }
+
+type CustomTransactionMember struct {
+	ID              int       `json:"id"`
+	MemberCode      string    `json:"member_code"`
+	TransactionCode string    `json:"transaction_code"`
+	MemberName      string    `json:"member_name"`
+	Transactions    string    `json:"product_and_quantity"`
+	TotalQuantity   int       `json:"total_quantity"`
+	Amount          int       `json:"amount"`
+	Name            string    `json:"casheer_name"`
+	CreatedAt       time.Time `json:"created_at"`
+}

@@ -19,6 +19,7 @@ import (
 
 type TransactionUseCase interface {
 	FindAll() ([]domains.CustomTransaction, error)
+	FindAllMember() ([]domains.CustomTransactionMember, error)
 	Create(input transaction.CreateInput) (domains.Transaction, error)
 }
 
@@ -38,6 +39,36 @@ func NewUseCase(transactionRepo transactionMysql.Repository,
 
 func (u *usecase) FindAll() ([]domains.CustomTransaction, error) {
 	transactions, err := u.transactionRepo.FindAll()
+	var totalQuantity int
+	var jsonData []map[string]string
+	if err != nil {
+		return transactions, err
+	}
+	for i, t := range transactions {
+		productQuantities := parseInput(t.Transactions)
+		for _, t := range productQuantities {
+			product, err := u.productRepo.FindByProductID(t.ProductID)
+			if err != nil {
+				fmt.Printf("Error finding product with ID %d: %s\n", t.ProductID, err)
+				continue
+			}
+			totalQuantity += t.Quantity
+			jsonData = append(jsonData, map[string]string{"product_name": product.Name, "quantity": strconv.Itoa(t.Quantity)})
+		}
+		jsonBytes, err := json.Marshal(jsonData)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return transactions, err
+		}
+		jsonString := string(jsonBytes)
+		transactions[i].TotalQuantity = totalQuantity
+		transactions[i].Transactions = jsonString
+	}
+	return transactions, nil
+}
+
+func (u *usecase) FindAllMember() ([]domains.CustomTransactionMember, error) {
+	transactions, err := u.transactionRepo.FindAllMember()
 	var totalQuantity int
 	var jsonData []map[string]string
 	if err != nil {

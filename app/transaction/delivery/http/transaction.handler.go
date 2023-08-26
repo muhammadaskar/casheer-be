@@ -30,6 +30,18 @@ func (h *TransactionHandler) FindAll(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *TransactionHandler) FindAllMember(c *gin.Context) {
+	transactions, err := h.transactionUseCase.FindAllMember()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get transactions", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get transactions", http.StatusOK, "success", transactions)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	var input transaction.CreateInput
 

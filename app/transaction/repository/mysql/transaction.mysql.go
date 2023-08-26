@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	FindAll() ([]domains.CustomTransaction, error)
+	FindAllMember() ([]domains.CustomTransactionMember, error)
 	Create(transaction domains.Transaction) (domains.Transaction, error)
 }
 
@@ -32,6 +33,20 @@ func (r *repository) FindAll() ([]domains.CustomTransaction, error) {
 	query := `SELECT transactions.id, member_code, transaction_code, transactions, amount, users.name as name, transactions.created_at 
 	FROM transactions
 	LEFT JOIN users ON transactions.user_id = users.id`
+	err := r.db.Raw(query).Scan(&transactions).Error
+	if err != nil {
+		return transactions, err
+	}
+	return transactions, nil
+}
+
+func (r *repository) FindAllMember() ([]domains.CustomTransactionMember, error) {
+	var transactions []domains.CustomTransactionMember
+
+	query := `SELECT transactions.id, transactions.member_code, members.name AS member_name, transaction_code, transactions, amount, users.name as name, transactions.created_at 
+	FROM transactions
+	INNER JOIN users ON transactions.user_id = users.id
+	INNER JOIN members ON transactions.member_code = members.member_code;`
 	err := r.db.Raw(query).Scan(&transactions).Error
 	if err != nil {
 		return transactions, err
