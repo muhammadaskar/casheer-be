@@ -40,3 +40,7 @@ type CustomTransactionMember struct {
 	Name            string    `json:"casheer_name"`
 	CreatedAt       time.Time `json:"created_at"`
 }
+
+type CustomTransactionAmount struct {
+	Amount int `json:"amount"`
+}

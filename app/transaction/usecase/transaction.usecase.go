@@ -20,6 +20,7 @@ import (
 type TransactionUseCase interface {
 	FindAll() ([]domains.CustomTransaction, error)
 	FindAllMember() ([]domains.CustomTransactionMember, error)
+	GetAmountOneMonthAgo() (domains.CustomTransactionAmount, error)
 	Create(input transaction.CreateInput) (domains.Transaction, error)
 }
 
@@ -95,6 +96,22 @@ func (u *usecase) FindAllMember() ([]domains.CustomTransactionMember, error) {
 		transactions[i].Transactions = jsonString
 	}
 	return transactions, nil
+}
+
+func (u *usecase) GetAmountOneMonthAgo() (domains.CustomTransactionAmount, error) {
+	currentTime := time.Now()
+	oneMonthAgo := currentTime.AddDate(0, -1, 0)
+
+	layout := "2006-01-02 15:04:05.999" // Format layout
+
+	currentFormatted := currentTime.Format(layout)
+	oneMonthAgoFormatted := oneMonthAgo.Format(layout)
+
+	transaction, err := u.transactionRepo.GetAmountOneMonthAgo(currentFormatted, oneMonthAgoFormatted)
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
 }
 
 func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, error) {
