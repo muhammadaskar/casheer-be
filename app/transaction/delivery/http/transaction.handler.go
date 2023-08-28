@@ -54,6 +54,18 @@ func (h *TransactionHandler) GetAmountOneMonthAgo(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *TransactionHandler) GetItemOutOneMonthAgo(c *gin.Context) {
+	transactions, err := h.transactionUseCase.GetItemOutOneMonthAgo()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get items transaction for one month ago", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get items transaction for one month ago", http.StatusOK, "success", transactions)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	var input transaction.CreateInput
 

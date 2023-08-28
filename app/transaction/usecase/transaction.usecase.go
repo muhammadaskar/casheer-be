@@ -21,6 +21,7 @@ type TransactionUseCase interface {
 	FindAll() ([]domains.CustomTransaction, error)
 	FindAllMember() ([]domains.CustomTransactionMember, error)
 	GetAmountOneMonthAgo() (domains.CustomTransactionAmount, error)
+	GetItemOutOneMonthAgo() (domains.CustomTransactionTotalQuantity, error)
 	Create(input transaction.CreateInput) (domains.Transaction, error)
 }
 
@@ -64,6 +65,22 @@ func (u *usecase) GetAmountOneMonthAgo() (domains.CustomTransactionAmount, error
 	oneMonthAgoFormatted := oneMonthAgo.Format(layout)
 
 	transaction, err := u.transactionRepo.GetAmountOneMonthAgo(currentFormatted, oneMonthAgoFormatted)
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
+}
+
+func (u *usecase) GetItemOutOneMonthAgo() (domains.CustomTransactionTotalQuantity, error) {
+	currentTime := time.Now()
+	oneMonthAgo := currentTime.AddDate(0, -1, 0)
+
+	layout := "2006-01-02 15:04:05.999" // Format layout
+
+	currentFormatted := currentTime.Format(layout)
+	oneMonthAgoFormatted := oneMonthAgo.Format(layout)
+
+	transaction, err := u.transactionRepo.GetItemOneOutMonthAgo(currentFormatted, oneMonthAgoFormatted)
 	if err != nil {
 		return transaction, err
 	}

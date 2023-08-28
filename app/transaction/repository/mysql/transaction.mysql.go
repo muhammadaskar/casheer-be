@@ -9,6 +9,7 @@ type Repository interface {
 	FindAll() ([]domains.CustomTransaction, error)
 	FindAllMember() ([]domains.CustomTransactionMember, error)
 	GetAmountOneMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionAmount, error)
+	GetItemOneOutMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionTotalQuantity, error)
 	Create(transaction domains.Transaction) (domains.Transaction, error)
 }
 
@@ -63,6 +64,20 @@ func (r *repository) GetAmountOneMonthAgo(currentTime string, oneMonthAgo string
 	WHERE created_at >= ?
 	AND created_at <=  ?`
 	err := r.db.Raw(query, oneMonthAgo, currentTime).Scan(&transaction.Amount).Error
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
+}
+
+func (r *repository) GetItemOneOutMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionTotalQuantity, error) {
+	var transaction domains.CustomTransactionTotalQuantity
+
+	query := `SELECT SUM(total_quantity) 
+	FROM transactions 
+	WHERE created_at >= ?
+	AND created_at <=  ?`
+	err := r.db.Raw(query, oneMonthAgo, currentTime).Scan(&transaction.TotalQuantity).Error
 	if err != nil {
 		return transaction, err
 	}

@@ -45,3 +45,7 @@ type CustomTransactionMember struct {
 type CustomTransactionAmount struct {
 	Amount int `json:"amount"`
 }
+
+type CustomTransactionTotalQuantity struct {
+	TotalQuantity int `json:"total_quantity"`
+}
