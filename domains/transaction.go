@@ -7,6 +7,7 @@ type Transaction struct {
 	MemberCode      string
 	TransactionCode string
 	Transactions    string
+	TotalQuantity   int
 	Amount          int
 	UserID          int
 	CreatedAt       time.Time

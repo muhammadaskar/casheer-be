@@ -40,60 +40,16 @@ func NewUseCase(transactionRepo transactionMysql.Repository,
 
 func (u *usecase) FindAll() ([]domains.CustomTransaction, error) {
 	transactions, err := u.transactionRepo.FindAll()
-	var totalQuantity int
-	var jsonData []map[string]string
 	if err != nil {
 		return transactions, err
-	}
-	for i, t := range transactions {
-		productQuantities := parseInput(t.Transactions)
-		for _, t := range productQuantities {
-			product, err := u.productRepo.FindByProductID(t.ProductID)
-			if err != nil {
-				fmt.Printf("Error finding product with ID %d: %s\n", t.ProductID, err)
-				continue
-			}
-			totalQuantity += t.Quantity
-			jsonData = append(jsonData, map[string]string{"product_name": product.Name, "quantity": strconv.Itoa(t.Quantity)})
-		}
-		jsonBytes, err := json.Marshal(jsonData)
-		if err != nil {
-			fmt.Println("Error:", err)
-			return transactions, err
-		}
-		jsonString := string(jsonBytes)
-		transactions[i].TotalQuantity = totalQuantity
-		transactions[i].Transactions = jsonString
 	}
 	return transactions, nil
 }
 
 func (u *usecase) FindAllMember() ([]domains.CustomTransactionMember, error) {
 	transactions, err := u.transactionRepo.FindAllMember()
-	var totalQuantity int
-	var jsonData []map[string]string
 	if err != nil {
 		return transactions, err
-	}
-	for i, t := range transactions {
-		productQuantities := parseInput(t.Transactions)
-		for _, t := range productQuantities {
-			product, err := u.productRepo.FindByProductID(t.ProductID)
-			if err != nil {
-				fmt.Printf("Error finding product with ID %d: %s\n", t.ProductID, err)
-				continue
-			}
-			totalQuantity += t.Quantity
-			jsonData = append(jsonData, map[string]string{"product_name": product.Name, "quantity": strconv.Itoa(t.Quantity)})
-		}
-		jsonBytes, err := json.Marshal(jsonData)
-		if err != nil {
-			fmt.Println("Error:", err)
-			return transactions, err
-		}
-		jsonString := string(jsonBytes)
-		transactions[i].TotalQuantity = totalQuantity
-		transactions[i].Transactions = jsonString
 	}
 	return transactions, nil
 }
@@ -118,6 +74,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 	transaction := domains.Transaction{}
 	memberCode := input.MemberCode
 	var totalAmount int
+	var totalQuantity int
 
 	if memberCode != "" {
 		member, err := u.memberRepo.FindByMemberCode(memberCode)
@@ -145,27 +102,22 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 		if err != nil {
 			return transaction, err
 		}
+		var productData []map[string]string
 
-		for _, proudctQuantity := range productQuantities {
-			product, err := u.productRepo.FindByProductID(proudctQuantity.ProductID)
+		for _, pq := range productQuantities {
+			product, err := u.productRepo.FindByProductID(pq.ProductID)
 			if err != nil {
-				fmt.Printf("Error finding product with ID %d: %s\n", proudctQuantity.ProductID, err)
+				fmt.Printf("Error finding product with ID %d: %s\n", pq.ProductID, err)
 				continue
 			}
 
-			if product.ID == 0 || product.IsDeleted == 0 {
-				return transaction, errors.New("product id is not available")
-			}
-
-			if proudctQuantity.Quantity > product.Quantity {
-				return transaction, errors.New("Product quantity " + product.Name + " is not enough")
-			}
-
-			result := calculateTotalPrice(float64(product.Price), float64(discount.Discount), proudctQuantity.Quantity)
+			result := calculateTotalPrice(float64(product.Price), float64(discount.Discount), pq.Quantity)
 			totalAmount += int(result)
 
-			productQuantity := product.Quantity - proudctQuantity.Quantity
+			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
+
+			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity)})
 
 			_, err = u.productRepo.Update(product)
 			if err != nil {
@@ -173,50 +125,54 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			}
 		}
 
+		quantities, err := u.quantityParse(input)
+		if err != nil {
+			return transaction, err
+		}
+
+		for _, quantity := range quantities {
+			totalQuantity += quantity.Quantity
+		}
+
+		jsonBytes, err := json.Marshal(productData)
+		jsonString := string(jsonBytes)
+
 		transaction.Amount = totalAmount
 		transaction.UserID = input.User.ID
-		transaction.Transactions = input.Transactions
+		transaction.Transactions = jsonString
+		transaction.TotalQuantity = totalQuantity
+
 		newTransaction, err := u.transactionRepo.Create(transaction)
 		if err != nil {
 			return newTransaction, err
 		}
 		return newTransaction, nil
-
 	} else {
 		// kondisi jika bukan member, maka tidak akan mendapatkan discount
 		transaction.MemberCode = input.MemberCode
 		transaction.TransactionCode = generateTransactionCode()
 
-		// productQuantities := parseInput(input.Transactions)
 		productQuantities, err := u.productParse(input)
 		if err != nil {
 			return transaction, err
 		}
 
-		for _, proudctQuantity := range productQuantities {
-			product, err := u.productRepo.FindByProductID(proudctQuantity.ProductID)
+		var productData []map[string]string
+
+		for _, pq := range productQuantities {
+			product, err := u.productRepo.FindByProductID(pq.ProductID)
 			if err != nil {
-				fmt.Printf("Error finding product with ID %d: %s\n", proudctQuantity.ProductID, err)
+				fmt.Printf("Error finding product with ID %d: %s\n", pq.ProductID, err)
 				continue
 			}
 
-			if err != nil {
-				return transaction, err
-			}
-
-			if product.ID == 0 || product.IsDeleted == 0 {
-				return transaction, errors.New("product id is not available")
-			}
-
-			if proudctQuantity.Quantity > product.Quantity {
-				return transaction, errors.New("Product quantity " + product.Name + " is not enough")
-			}
-
-			result := (product.Price * proudctQuantity.Quantity)
+			result := (product.Price * pq.Quantity)
 			totalAmount += result
 
-			productQuantity := product.Quantity - proudctQuantity.Quantity
+			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
+
+			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity)})
 
 			_, err = u.productRepo.Update(product)
 			if err != nil {
@@ -224,9 +180,21 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			}
 		}
 
+		quantities, err := u.quantityParse(input)
+		if err != nil {
+			return transaction, err
+		}
+
+		for _, quantity := range quantities {
+			totalQuantity += quantity.Quantity
+		}
+		jsonBytes, err := json.Marshal(productData)
+		jsonString := string(jsonBytes)
+
 		transaction.Amount = totalAmount
 		transaction.UserID = input.User.ID
-		transaction.Transactions = input.Transactions
+		transaction.Transactions = jsonString
+		transaction.TotalQuantity = totalQuantity
 
 		newTransaction, err := u.transactionRepo.Create(transaction)
 		if err != nil {
@@ -292,7 +260,8 @@ func (u *usecase) productParse(input transaction.CreateInput) ([]domains.Transac
 		if err != nil {
 			return productQuantities, err
 		}
-		if product.ID == 0 {
+
+		if product.ID == 0 || product.IsDeleted == 0 {
 			return productQuantities, errors.New("product id is not available")
 		}
 
@@ -300,5 +269,10 @@ func (u *usecase) productParse(input transaction.CreateInput) ([]domains.Transac
 			return productQuantities, errors.New("product quantity " + product.Name + " is not enough")
 		}
 	}
+	return productQuantities, nil
+}
+
+func (u *usecase) quantityParse(input transaction.CreateInput) ([]domains.TransactionProductQuantity, error) {
+	productQuantities := parseInput(input.Transactions)
 	return productQuantities, nil
 }

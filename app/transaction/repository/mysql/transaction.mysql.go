@@ -31,7 +31,7 @@ func (r *repository) Create(transaction domains.Transaction) (domains.Transactio
 func (r *repository) FindAll() ([]domains.CustomTransaction, error) {
 	var transactions []domains.CustomTransaction
 
-	query := `SELECT transactions.id, member_code, transaction_code, transactions, amount, users.name as name, transactions.created_at 
+	query := `SELECT transactions.id, member_code, transaction_code, transactions, total_quantity, amount, users.name as name, transactions.created_at 
 	FROM transactions
 	LEFT JOIN users ON transactions.user_id = users.id`
 	err := r.db.Raw(query).Scan(&transactions).Error
@@ -44,7 +44,7 @@ func (r *repository) FindAll() ([]domains.CustomTransaction, error) {
 func (r *repository) FindAllMember() ([]domains.CustomTransactionMember, error) {
 	var transactions []domains.CustomTransactionMember
 
-	query := `SELECT transactions.id, transactions.member_code, members.name AS member_name, transaction_code, transactions, amount, users.name as name, transactions.created_at 
+	query := `SELECT transactions.id, transactions.member_code, members.name AS member_name, transaction_code, transactions, total_quantity, amount, users.name as name, transactions.created_at 
 	FROM transactions
 	INNER JOIN users ON transactions.user_id = users.id
 	INNER JOIN members ON transactions.member_code = members.member_code;`
