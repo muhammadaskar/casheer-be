@@ -96,3 +96,53 @@ func (h *UserHandler) GetTotalCasheer(c *gin.Context) {
 	response := customresponse.APIResponse("Success to get total casheer", http.StatusOK, "success", casheer)
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *UserHandler) Activate(c *gin.Context) {
+	var inputID user.GetUserIDInput
+	err := c.BindUri(&inputID)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to accept user", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.userUseCase.Accept(inputID)
+	if err != nil {
+		errors := gin.H{"errors": err.Error()}
+
+		response := customresponse.APIResponse("Failed to accept user", http.StatusBadRequest, "error", errors)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("User success to activated", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *UserHandler) Reject(c *gin.Context) {
+	var inputID user.GetUserIDInput
+	err := c.BindUri(&inputID)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to reject user", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.userUseCase.Reject(inputID)
+	if err != nil {
+		errors := gin.H{"errors": err.Error()}
+
+		response := customresponse.APIResponse("Failed to reject user", http.StatusBadRequest, "error", errors)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("User success to rejected", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+}

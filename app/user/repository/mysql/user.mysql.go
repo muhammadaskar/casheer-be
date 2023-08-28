@@ -11,6 +11,7 @@ type Repository interface {
 	FindByUsername(username string) (domains.User, error)
 	FindById(ID int) (domains.User, error)
 	GetTotalCasheer() (domains.CustomTotalCasheer, error)
+	Update(user domains.User) (domains.User, error)
 }
 
 type repository struct {
@@ -76,4 +77,12 @@ func (r *repository) GetTotalCasheer() (domains.CustomTotalCasheer, error) {
 		return casheer, err
 	}
 	return casheer, nil
+}
+
+func (r *repository) Update(user domains.User) (domains.User, error) {
+	err := r.db.Save(&user).Error
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }

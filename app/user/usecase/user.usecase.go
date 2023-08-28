@@ -18,6 +18,8 @@ type UserUseCase interface {
 	IsUsernameAvailable(username string) (bool, error)
 	GetUserById(ID int) (domains.User, error)
 	GetTotalCasheer() (domains.CustomTotalCasheer, error)
+	Accept(inputID user.GetUserIDInput) (domains.User, error)
+	Reject(inputID user.GetUserIDInput) (domains.User, error)
 }
 
 type usecase struct {
@@ -120,6 +122,52 @@ func (u *usecase) GetTotalCasheer() (domains.CustomTotalCasheer, error) {
 		return casheer, err
 	}
 	return casheer, nil
+}
+
+func (u *usecase) Accept(inputID user.GetUserIDInput) (domains.User, error) {
+	user, err := u.userRepository.FindById(inputID.ID)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("User not found")
+	}
+
+	if user.IsActive != 1 || user.IsActive == 0 || user.IsActive == -1 {
+		return user, errors.New("Failed")
+	}
+
+	user.IsActive = 0
+
+	newUser, err := u.userRepository.Update(user)
+	if err != nil {
+		return newUser, err
+	}
+	return newUser, nil
+}
+
+func (u *usecase) Reject(inputID user.GetUserIDInput) (domains.User, error) {
+	user, err := u.userRepository.FindById(inputID.ID)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("User not found")
+	}
+
+	if user.IsActive != 1 || user.IsActive == -1 || user.IsActive == 0 {
+		return user, errors.New("Failed")
+	}
+
+	user.IsActive = -1
+
+	newUser, err := u.userRepository.Update(user)
+	if err != nil {
+		return newUser, err
+	}
+	return newUser, nil
 }
 
 func (s *usecase) IsEmailAvailable(email string) (bool, error) {
