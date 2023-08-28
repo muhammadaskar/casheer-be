@@ -84,3 +84,15 @@ func (h *UserHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+func (h *UserHandler) GetTotalCasheer(c *gin.Context) {
+	casheer, err := h.userUseCase.GetTotalCasheer()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get total casheer", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get total casheer", http.StatusOK, "success", casheer)
+	c.JSON(http.StatusOK, response)
+}

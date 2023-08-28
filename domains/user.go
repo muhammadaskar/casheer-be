@@ -15,3 +15,7 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type CustomTotalCasheer struct {
+	TotalCasheer int `json:"total_casheer"`
+}

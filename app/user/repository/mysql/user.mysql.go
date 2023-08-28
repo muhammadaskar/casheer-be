@@ -10,6 +10,7 @@ type Repository interface {
 	FindByEmail(email string) (domains.User, error)
 	FindByUsername(username string) (domains.User, error)
 	FindById(ID int) (domains.User, error)
+	GetTotalCasheer() (domains.CustomTotalCasheer, error)
 }
 
 type repository struct {
@@ -61,4 +62,18 @@ func (r *repository) FindById(ID int) (domains.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *repository) GetTotalCasheer() (domains.CustomTotalCasheer, error) {
+	var casheer domains.CustomTotalCasheer
+
+	query := `SELECT COUNT(*) AS count FROM users
+	WHERE role=1
+	AND is_active=0;`
+
+	err := r.db.Raw(query).Scan(&casheer.TotalCasheer).Error
+	if err != nil {
+		return casheer, err
+	}
+	return casheer, nil
 }

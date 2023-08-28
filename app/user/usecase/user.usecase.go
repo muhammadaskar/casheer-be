@@ -17,6 +17,7 @@ type UserUseCase interface {
 	IsEmailAvailable(email string) (bool, error)
 	IsUsernameAvailable(username string) (bool, error)
 	GetUserById(ID int) (domains.User, error)
+	GetTotalCasheer() (domains.CustomTotalCasheer, error)
 }
 
 type usecase struct {
@@ -111,6 +112,14 @@ func (u *usecase) Login(input user.LoginInput) (domains.User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *usecase) GetTotalCasheer() (domains.CustomTotalCasheer, error) {
+	casheer, err := u.userRepository.GetTotalCasheer()
+	if err != nil {
+		return casheer, err
+	}
+	return casheer, nil
 }
 
 func (s *usecase) IsEmailAvailable(email string) (bool, error) {

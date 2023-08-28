@@ -128,6 +128,8 @@ func NewRouter() *gin.Engine {
 		api.GET("/transaction/amount", authMiddleware, transactionHandler.GetAmountOneMonthAgo)
 		api.GET("/transaction/item-out", authMiddleware, transactionHandler.GetItemOutOneMonthAgo)
 		api.POST("/transaction", authMiddleware, transactionHandler.CreateTransaction)
+
+		api.GET("/user/total-casheer", authAdminMiddleware, userHandler.GetTotalCasheer)
 	}
 
 	return router
