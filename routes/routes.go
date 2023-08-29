@@ -122,6 +122,7 @@ func NewRouter() *gin.Engine {
 
 		api.GET("/member", authMiddleware, memberHandler.FindAll)
 		api.POST("/member", authAdminMiddleware, memberHandler.Create)
+		api.PUT("/member/:id", authAdminMiddleware, memberHandler.Update)
 
 		api.GET("/transaction", authMiddleware, transactionHandler.FindAll)
 		api.GET("/transaction/member", authMiddleware, transactionHandler.FindAllMember)

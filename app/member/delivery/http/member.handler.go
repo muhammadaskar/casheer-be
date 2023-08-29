@@ -57,3 +57,42 @@ func (h *MemberHandler) Create(c *gin.Context) {
 	response := customresponse.APIResponse("Success to create member", http.StatusCreated, "success", newMember)
 	c.JSON(http.StatusCreated, response)
 }
+
+func (h *MemberHandler) Update(c *gin.Context) {
+	var inputID member.GetMemberIDInput
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMesssage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to update member", http.StatusUnprocessableEntity, "error", errorMesssage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	var input member.CreateInput
+
+	err = c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMesssage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to update member", http.StatusUnprocessableEntity, "error", errorMesssage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(domains.User)
+	input.User = currentUser
+
+	newMember, err := h.memberUseCase.Update(inputID, input)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := customresponse.APIResponse("Failed to update member", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to update member", http.StatusCreated, "success", newMember)
+	c.JSON(http.StatusCreated, response)
+}

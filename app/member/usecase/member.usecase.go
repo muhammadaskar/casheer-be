@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 type MemberUseCase interface {
 	FindAll() ([]domains.Member, error)
 	Create(input member.CreateInput) (domains.Member, error)
+	Update(inputID member.GetMemberIDInput, inputData member.CreateInput) (domains.Member, error)
 }
 
 type usecase struct {
@@ -67,6 +69,31 @@ func (u *usecase) Create(input member.CreateInput) (domains.Member, error) {
 	}
 
 	return newMember, nil
+}
+
+func (u *usecase) Update(inputID member.GetMemberIDInput, inputData member.CreateInput) (domains.Member, error) {
+	member, err := u.repository.FindByID(inputID.ID)
+	if err != nil {
+		return member, err
+	}
+
+	member.Name = inputData.Name
+	// if member.Phone == inputData.Phone {
+	isPhoneAvailable, err := u.isMemberPhoneAvailable(inputData.Phone)
+	if err != nil {
+		return member, err
+	}
+
+	if isPhoneAvailable && inputData.Phone != member.Phone {
+		return member, errors.New("Member phone is not available")
+	}
+	member.Phone = inputData.Phone
+
+	fmt.Println(member)
+
+	return member, nil
+
+	// }
 }
 
 func generateMemberCode() string {
