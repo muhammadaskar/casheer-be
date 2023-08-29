@@ -130,9 +130,9 @@ func NewRouter() *gin.Engine {
 		api.GET("/transaction/item-out", authMiddleware, transactionHandler.GetItemOutOneMonthAgo)
 		api.POST("/transaction", authMiddleware, transactionHandler.CreateTransaction)
 
+		api.PUT("/user/activate/:id", authAdminMiddleware, userHandler.Activate)
+		api.PUT("/user/reject/:id", authAdminMiddleware, userHandler.Reject)
 		api.GET("/user/total-casheer", authAdminMiddleware, userHandler.GetTotalCasheer)
-		api.POST("/user/activate/:id", authAdminMiddleware, userHandler.Activate)
-		api.POST("/user/reject/:id", authAdminMiddleware, userHandler.Reject)
 	}
 
 	return router
