@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -78,7 +77,6 @@ func (u *usecase) Update(inputID member.GetMemberIDInput, inputData member.Creat
 	}
 
 	member.Name = inputData.Name
-	// if member.Phone == inputData.Phone {
 	isPhoneAvailable, err := u.isMemberPhoneAvailable(inputData.Phone)
 	if err != nil {
 		return member, err
@@ -89,11 +87,12 @@ func (u *usecase) Update(inputID member.GetMemberIDInput, inputData member.Creat
 	}
 	member.Phone = inputData.Phone
 
-	fmt.Println(member)
+	updateMember, err := u.repository.Update(member)
+	if err != nil {
+		return updateMember, err
+	}
 
-	return member, nil
-
-	// }
+	return updateMember, nil
 }
 
 func generateMemberCode() string {

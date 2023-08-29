@@ -85,7 +85,7 @@ func (h *MemberHandler) Update(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(domains.User)
 	input.User = currentUser
 
-	newMember, err := h.memberUseCase.Update(inputID, input)
+	updateMember, err := h.memberUseCase.Update(inputID, input)
 	if err != nil {
 		errorMessage := gin.H{"errors": err.Error()}
 		response := customresponse.APIResponse("Failed to update member", http.StatusBadRequest, "error", errorMessage)
@@ -93,6 +93,6 @@ func (h *MemberHandler) Update(c *gin.Context) {
 		return
 	}
 
-	response := customresponse.APIResponse("Success to update member", http.StatusCreated, "success", newMember)
+	response := customresponse.APIResponse("Success to update member", http.StatusCreated, "success", updateMember)
 	c.JSON(http.StatusCreated, response)
 }
