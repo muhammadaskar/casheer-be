@@ -186,10 +186,7 @@ func (h *ProductHandler) UpdateProductQuantity(c *gin.Context) {
 		return
 	}
 
-	currentUser := c.MustGet("currentUser").(domains.User)
-	input.User = currentUser
-
-	updateProduct, err := h.productUseCase.UpdateQuantity(inputID, input)
+	_, err = h.productUseCase.UpdateQuantity(inputID, input)
 	if err != nil {
 		errorMessage := gin.H{"errors": err.Error()}
 		response := customresponse.APIResponse("Failed to update product quantity", http.StatusBadRequest, "error", errorMessage)
@@ -197,7 +194,7 @@ func (h *ProductHandler) UpdateProductQuantity(c *gin.Context) {
 		return
 	}
 
-	response := customresponse.APIResponse("Success to update product quantity", http.StatusCreated, "success", product.FormatProduct(updateProduct))
+	response := customresponse.APIResponse("Success to update product quantity", http.StatusCreated, "success", nil)
 	c.JSON(http.StatusCreated, response)
 }
 

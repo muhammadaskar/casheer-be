@@ -13,6 +13,7 @@ type Repository interface {
 	FindByProductID(id int) (domains.Product, error)
 	Create(product domains.Product) (domains.Product, error)
 	Update(product domains.Product) (domains.Product, error)
+	UpdateQty(id int, qty int) (domains.Product, error)
 }
 
 type repository struct {
@@ -121,6 +122,16 @@ func (r *repository) Create(product domains.Product) (domains.Product, error) {
 
 func (r *repository) Update(product domains.Product) (domains.Product, error) {
 	err := r.db.Save(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (r *repository) UpdateQty(id int, qty int) (domains.Product, error) {
+	var product domains.Product
+	err := r.db.Model(&product).Where("id = ?", id).Update("quantity", qty).Error
 	if err != nil {
 		return product, err
 	}

@@ -157,19 +157,7 @@ func (u *usecase) UpdateQuantity(inputID product.GetProductDetailInput, inputDat
 	if product.ID == 0 {
 		return product, errors.New("No product on that ID")
 	}
-
-	product.Quantity = inputData.Quantity
-
-	now := time.Now()
-
-	// Get the date by setting the time part to 00:00:00
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-
-	product.Image = "https://img-global.cpcdn.com/recipes/93a46a53e22256b8/680x482cq70/songkolo-bagadang-ketan-serundeng-foto-resep-utama.jpg"
-	product.EntryAt = today
-	// product.ExpiredAt = input.ExpiredAt
-
-	updateProduct, err := u.repository.Update(product)
+	updateProduct, err := u.repository.UpdateQty(int(product.ID), inputData.Quantity)
 	if err != nil {
 		return updateProduct, err
 	}

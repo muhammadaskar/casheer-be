@@ -25,5 +25,4 @@ type CreateInput struct {
 
 type UpdateQuantity struct {
 	Quantity int `json:"quantity" bind:"required"`
-	User     domains.User
 }
