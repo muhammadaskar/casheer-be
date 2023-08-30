@@ -18,6 +18,7 @@ type ProductUseCase interface {
 	Create(input product.CreateInput) (domains.Product, error)
 	Update(inputID product.GetProductDetailInput, inputData product.CreateInput) (domains.Product, error)
 	Delete(input product.GetProductDetailInput) (domains.Product, error)
+	UpdateQuantity(inputID product.GetProductDetailInput, inputData product.UpdateQuantity) (domains.Product, error)
 }
 
 type usecase struct {
@@ -129,6 +130,35 @@ func (u *usecase) Update(inputID product.GetProductDetailInput, inputData produc
 	product.Description = inputData.Description
 	product.UserID = inputData.User.ID
 	product.CategoryID = inputData.CategoryID
+
+	now := time.Now()
+
+	// Get the date by setting the time part to 00:00:00
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+
+	product.Image = "https://img-global.cpcdn.com/recipes/93a46a53e22256b8/680x482cq70/songkolo-bagadang-ketan-serundeng-foto-resep-utama.jpg"
+	product.EntryAt = today
+	// product.ExpiredAt = input.ExpiredAt
+
+	updateProduct, err := u.repository.Update(product)
+	if err != nil {
+		return updateProduct, err
+	}
+
+	return updateProduct, nil
+}
+
+func (u *usecase) UpdateQuantity(inputID product.GetProductDetailInput, inputData product.UpdateQuantity) (domains.Product, error) {
+	product, err := u.repository.FindByProductID(inputID.ID)
+	if err != nil {
+		return product, err
+	}
+
+	if product.ID == 0 {
+		return product, errors.New("No product on that ID")
+	}
+
+	product.Quantity = inputData.Quantity
 
 	now := time.Now()
 

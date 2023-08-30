@@ -22,3 +22,8 @@ type CreateInput struct {
 	Description string `json:"description" bind:"required"`
 	User        domains.User
 }
+
+type UpdateQuantity struct {
+	Quantity int `json:"quantity" bind:"required"`
+	User     domains.User
+}

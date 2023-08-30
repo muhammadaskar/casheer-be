@@ -129,7 +129,7 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 		errors := customresponse.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := customresponse.APIResponse("Failed to create product", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := customresponse.APIResponse("Failed to update product", http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -158,6 +158,46 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 	}
 
 	response := customresponse.APIResponse("Success to update product", http.StatusCreated, "success", product.FormatProduct(updateProduct))
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *ProductHandler) UpdateProductQuantity(c *gin.Context) {
+	var inputID product.GetProductDetailInput
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to update product quantity", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	var input product.UpdateQuantity
+
+	err = c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to update product quantity", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(domains.User)
+	input.User = currentUser
+
+	updateProduct, err := h.productUseCase.UpdateQuantity(inputID, input)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := customresponse.APIResponse("Failed to update product quantity", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to update product quantity", http.StatusCreated, "success", product.FormatProduct(updateProduct))
 	c.JSON(http.StatusCreated, response)
 }
 
