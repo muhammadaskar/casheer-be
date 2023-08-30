@@ -6,39 +6,11 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
-	"mime"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 )
-
-func NewFileUpload(base64Data string, filePath string) (string, error) {
-	// unique := generateUUID()
-	imageData, err := base64.StdEncoding.DecodeString(base64Data)
-	if err != nil {
-		return "", err
-	}
-
-	ext := filepath.Ext(filePath)
-	mimeType := mime.TypeByExtension(ext)
-
-	file, err := os.Create(filePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close() // Menutup file saat fungsi selesai dieksekusi
-
-	fileHeader := fmt.Sprintf("Content-Type: %s", mimeType)
-	file.WriteString(fileHeader + "\n\n")
-
-	_, err = file.Write(imageData)
-	if err != nil {
-		return "", err
-	}
-
-	fmt.Println("Image saved to:", filePath)
-	return file.Name(), nil
-}
 
 func Upload(filePath string, fileName string, content string) (string, error) {
 	fileName = generateUUID() + ".png"
@@ -86,16 +58,16 @@ func GetFileImage(path string, fileName string) (string, error) {
 	var base64Encoding string
 
 	// Determine the content type of the image file
-	// mimeType := http.DetectContentType(bytes)
+	mimeType := http.DetectContentType(bytes)
 
 	// Prepend the appropriate URI scheme header depending
 	// on the MIME type
-	// switch mimeType {
-	// case "image/jpeg":
-	// 	base64Encoding += "data:image/jpeg;base64,"
-	// case "image/png":
-	base64Encoding += "data:image/png;base64,"
-	// }
+	switch mimeType {
+	case "image/jpeg":
+		base64Encoding += "data:image/jpeg;base64,"
+	case "image/png":
+		base64Encoding += "data:image/png;base64,"
+	}
 
 	// Append the base64 encoded output
 	base64Encoding += toBase64(bytes)
