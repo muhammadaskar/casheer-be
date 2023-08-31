@@ -56,7 +56,7 @@ func NewRouter() *gin.Engine {
 	userUseCase := userUseCase.NewUseCase(userRepository, notificationRepository)
 	notificationUseCase := notificationUseCase.NewUseCase(notificationRepository)
 	categoryUseCase := categoryUseCase.NewUseCase(categoryRepository)
-	productUseCase := productUseCase.NewUseCase(productRepository)
+	productUseCase := productUseCase.NewUseCase(productRepository, notificationRepository)
 	discountUseCase := discountUseCase.NewUseCase(discountRepository)
 	memberUseCase := memberUseCase.NewUseCase(memberRepository)
 	transactionUseCase := memberUsecase.NewUseCase(transactionRepository, memberRepository, productRepository, discountRepository)

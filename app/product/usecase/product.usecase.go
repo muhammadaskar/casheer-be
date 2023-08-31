@@ -5,8 +5,9 @@ import (
 	"math"
 	"time"
 
+	notifRepo "github.com/muhammadaskar/casheer-be/app/notification/repository/mysql"
 	"github.com/muhammadaskar/casheer-be/app/product"
-	"github.com/muhammadaskar/casheer-be/app/product/repository/mysql"
+	productRepo "github.com/muhammadaskar/casheer-be/app/product/repository/mysql"
 	"github.com/muhammadaskar/casheer-be/domains"
 )
 
@@ -22,29 +23,51 @@ type ProductUseCase interface {
 }
 
 type usecase struct {
-	repository mysql.Repository
+	productRepository      productRepo.Repository
+	notificationRepository notifRepo.Repository
 }
 
-func NewUseCase(repository mysql.Repository) *usecase {
-	return &usecase{repository}
+func NewUseCase(productRepository productRepo.Repository, notificationRepository notifRepo.Repository) *usecase {
+	return &usecase{productRepository, notificationRepository}
 }
 
 func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error) {
 	if query.Query != "" {
-		product, err := u.repository.FindAll(query.Query, query.Page, query.Limit, true)
+		products, err := u.productRepository.FindAll(query.Query, query.Page, query.Limit, true)
 		if err != nil {
-			return product, true, err
+			return products, true, err
 		}
 
-		return product, true, nil
+		return products, true, nil
 	} else {
-		product, err := u.repository.FindAll(query.Query, query.Page, query.Limit, false)
+		products, err := u.productRepository.FindAll(query.Query, query.Page, query.Limit, false)
 		if err != nil {
-			return product, true, err
+			return products, true, err
 		}
+
+		for _, product := range products {
+			if product.Quantity == 0 {
+				notif, err := u.notificationRepository.FindByProductID(int(product.ID))
+				if err != nil {
+					return products, false, err
+				}
+				if notif.ID == 0 {
+					notification := domains.Notification{}
+					notification.Name = product.Name + " stock habis"
+					notification.ProductId = int(product.ID)
+					notification.Type = 2
+					notification.IsRead = 1
+					_, err = u.notificationRepository.CreateNotification(notification)
+					if err != nil {
+						return products, true, err
+					}
+				}
+			}
+		}
+
 		totalCount, err := u.CountAll()
 		if err != nil {
-			return product, true, err
+			return products, true, err
 		}
 
 		perPage := query.Limit
@@ -57,12 +80,12 @@ func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.Custom
 		// Periksa apakah Anda berada di halaman terakhir
 		isLastPage := currentPage == totalPages
 
-		return product, isLastPage, nil
+		return products, isLastPage, nil
 	}
 }
 
 func (u *usecase) GetAll() ([]domains.CustomProduct, error) {
-	products, err := u.repository.GetAll()
+	products, err := u.productRepository.GetAll()
 	if err != nil {
 		return products, err
 	}
@@ -72,7 +95,7 @@ func (u *usecase) GetAll() ([]domains.CustomProduct, error) {
 }
 
 func (u *usecase) CountAll() (int64, error) {
-	count, err := u.repository.Count()
+	count, err := u.productRepository.Count()
 	if err != nil {
 		return count, err
 	}
@@ -80,7 +103,7 @@ func (u *usecase) CountAll() (int64, error) {
 }
 
 func (u *usecase) FindById(input product.GetProductDetailInput) (domains.CustomResult, error) {
-	product, err := u.repository.FindById(input.ID)
+	product, err := u.productRepository.FindById(input.ID)
 	if err != nil {
 		return product, err
 	}
@@ -106,7 +129,7 @@ func (u *usecase) Create(input product.CreateInput) (domains.Product, error) {
 	product.IsDeleted = 1
 	// product.ExpiredAt = input.ExpiredAt
 
-	newProduct, err := u.repository.Create(product)
+	newProduct, err := u.productRepository.Create(product)
 	if err != nil {
 		return newProduct, err
 	}
@@ -115,7 +138,7 @@ func (u *usecase) Create(input product.CreateInput) (domains.Product, error) {
 }
 
 func (u *usecase) Update(inputID product.GetProductDetailInput, inputData product.CreateInput) (domains.Product, error) {
-	product, err := u.repository.FindByProductID(inputID.ID)
+	product, err := u.productRepository.FindByProductID(inputID.ID)
 	if err != nil {
 		return product, err
 	}
@@ -140,7 +163,7 @@ func (u *usecase) Update(inputID product.GetProductDetailInput, inputData produc
 	product.EntryAt = today
 	// product.ExpiredAt = input.ExpiredAt
 
-	updateProduct, err := u.repository.Update(product)
+	updateProduct, err := u.productRepository.Update(product)
 	if err != nil {
 		return updateProduct, err
 	}
@@ -149,7 +172,7 @@ func (u *usecase) Update(inputID product.GetProductDetailInput, inputData produc
 }
 
 func (u *usecase) UpdateQuantity(inputID product.GetProductDetailInput, inputData product.UpdateQuantity) (domains.Product, error) {
-	product, err := u.repository.FindByProductID(inputID.ID)
+	product, err := u.productRepository.FindByProductID(inputID.ID)
 	if err != nil {
 		return product, err
 	}
@@ -157,16 +180,30 @@ func (u *usecase) UpdateQuantity(inputID product.GetProductDetailInput, inputDat
 	if product.ID == 0 {
 		return product, errors.New("No product on that ID")
 	}
-	updateProduct, err := u.repository.UpdateQty(int(product.ID), inputData.Quantity)
+	updateProduct, err := u.productRepository.UpdateQty(int(product.ID), inputData.Quantity)
 	if err != nil {
 		return updateProduct, err
+	}
+
+	notification, err := u.notificationRepository.FindByProductID(product.ID)
+	if err != nil {
+		return updateProduct, err
+	}
+
+	if inputData.Quantity > 0 {
+		if notification.Type == 2 {
+			_, err := u.notificationRepository.DeleteNotification(notification)
+			if err != nil {
+				return updateProduct, err
+			}
+		}
 	}
 
 	return updateProduct, nil
 }
 
 func (u *usecase) Delete(input product.GetProductDetailInput) (domains.Product, error) {
-	product, err := u.repository.FindByProductID(input.ID)
+	product, err := u.productRepository.FindByProductID(input.ID)
 	if err != nil {
 		return product, err
 	}
@@ -181,7 +218,7 @@ func (u *usecase) Delete(input product.GetProductDetailInput) (domains.Product, 
 
 	product.IsDeleted = 0
 
-	deleteProduct, err := u.repository.Update(product)
+	deleteProduct, err := u.productRepository.Update(product)
 	if err != nil {
 		return deleteProduct, err
 	}
