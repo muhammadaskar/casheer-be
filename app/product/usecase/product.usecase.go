@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"time"
 
@@ -38,6 +39,11 @@ func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.Custom
 			return products, true, err
 		}
 
+		_, err = u.setNotification(products)
+		if err != nil {
+			return products, true, err
+		}
+
 		return products, true, nil
 	} else {
 		products, err := u.productRepository.FindAll(query.Query, query.Page, query.Limit, false)
@@ -45,24 +51,9 @@ func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.Custom
 			return products, true, err
 		}
 
-		for _, product := range products {
-			if product.Quantity == 0 {
-				notif, err := u.notificationRepository.FindByProductID(int(product.ID))
-				if err != nil {
-					return products, false, err
-				}
-				if notif.ID == 0 {
-					notification := domains.Notification{}
-					notification.Name = product.Name + " stock habis"
-					notification.ProductId = int(product.ID)
-					notification.Type = 2
-					notification.IsRead = 1
-					_, err = u.notificationRepository.CreateNotification(notification)
-					if err != nil {
-						return products, true, err
-					}
-				}
-			}
+		_, err = u.setNotification(products)
+		if err != nil {
+			return products, true, err
 		}
 
 		totalCount, err := u.CountAll()
@@ -90,8 +81,40 @@ func (u *usecase) GetAll() ([]domains.CustomProduct, error) {
 		return products, err
 	}
 
-	return products, nil
+	for _, product := range products {
+		if product.Quantity == 0 || product.Quantity < 5 {
+			fmt.Println("masuk sini")
+			notif, err := u.notificationRepository.FindByProductID(int(product.ID))
+			if err != nil {
+				return products, err
+			}
+			if notif.ID == 0 {
 
+				var notificationName string
+				var notificationType int
+
+				if product.Quantity == 0 {
+					notificationName = product.Name + " stock habis"
+					notificationType = 2
+				} else if product.Quantity < 5 {
+					notificationName = product.Name + " stock menipis"
+					notificationType = 3
+				}
+
+				notification := domains.Notification{}
+				notification.Name = notificationName
+				notification.ProductId = int(product.ID)
+				notification.Type = notificationType
+				notification.IsRead = 1
+				_, err = u.notificationRepository.CreateNotification(notification)
+				if err != nil {
+					return products, err
+				}
+			}
+		}
+	}
+
+	return products, nil
 }
 
 func (u *usecase) CountAll() (int64, error) {
@@ -190,8 +213,8 @@ func (u *usecase) UpdateQuantity(inputID product.GetProductDetailInput, inputDat
 		return updateProduct, err
 	}
 
-	if inputData.Quantity > 0 {
-		if notification.Type == 2 {
+	if inputData.Quantity > 0 || inputData.Quantity >= 5 {
+		if notification.Type == 2 || notification.Type == 3 {
 			_, err := u.notificationRepository.DeleteNotification(notification)
 			if err != nil {
 				return updateProduct, err
@@ -224,4 +247,39 @@ func (u *usecase) Delete(input product.GetProductDetailInput) (domains.Product, 
 	}
 
 	return deleteProduct, nil
+}
+
+func (u *usecase) setNotification(products []domains.CustomResult) ([]domains.CustomResult, error) {
+	for _, product := range products {
+		if product.Quantity == 0 || product.Quantity < 5 {
+			notif, err := u.notificationRepository.FindByProductID(int(product.ID))
+			if err != nil {
+				return products, err
+			}
+			if notif.ID == 0 {
+
+				var notificationName string
+				var notificationType int
+
+				if product.Quantity == 0 {
+					notificationName = product.Name + " stock habis"
+					notificationType = 2
+				} else if product.Quantity < 5 {
+					notificationName = product.Name + " stock menipis"
+					notificationType = 3
+				}
+
+				notification := domains.Notification{}
+				notification.Name = notificationName
+				notification.ProductId = int(product.ID)
+				notification.Type = notificationType
+				notification.IsRead = 1
+				_, err = u.notificationRepository.CreateNotification(notification)
+				if err != nil {
+					return products, err
+				}
+			}
+		}
+	}
+	return products, nil
 }
