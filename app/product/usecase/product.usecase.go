@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"time"
 
@@ -83,7 +82,6 @@ func (u *usecase) GetAll() ([]domains.CustomProduct, error) {
 
 	for _, product := range products {
 		if product.Quantity == 0 || product.Quantity < 5 {
-			fmt.Println("masuk sini")
 			notif, err := u.notificationRepository.FindByProductID(int(product.ID))
 			if err != nil {
 				return products, err

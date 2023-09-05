@@ -243,8 +243,8 @@ func calculateTotalPrice(originalPrice float64, discountPercentage float64, quan
 }
 
 func parseInput(input string) []domains.TransactionProductQuantity {
-	input = strings.Trim(input, "{}")     // Remove outer curly braces
-	pairs := strings.Split(input, "}, {") // Split into individual pairs
+	input = strings.Trim(input, "{}")    // Remove outer curly braces
+	pairs := strings.Split(input, "},{") // Split into individual pairs
 
 	var transactions []domains.TransactionProductQuantity
 
