@@ -83,21 +83,21 @@ func (u *usecase) Update(input store.CreateInput) (domains.Store, error) {
 	}
 
 	store.Name = input.Name
+	if input.Image != "" {
+		path := "assets/image/store/"
 
-	if input.Image == "" {
-		return store, errors.New("Image is required")
+		err = customstorage.Delete(path, store.Image)
+		if err != nil {
+			return store, err
+		}
+
+		image, err := customstorage.Upload(path, "logo", input.Image)
+		if err != nil {
+			return store, err
+		}
+
+		store.Image = image
 	}
-
-	path := "assets/image/store/"
-
-	err = customstorage.Delete(path, store.Image)
-	if err != nil {
-		return store, err
-	}
-
-	image, err := customstorage.Upload(path, "logo", input.Image)
-
-	store.Image = image
 
 	updateStore, err := u.repository.Update(store)
 	if err != nil {

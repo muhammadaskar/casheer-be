@@ -1,6 +1,6 @@
 package store
 
 type CreateInput struct {
-	Name  string `json:"name" binding:"required"`
-	Image string `json:"image" binding:"required"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }
