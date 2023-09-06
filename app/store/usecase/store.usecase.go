@@ -33,7 +33,7 @@ func (u *usecase) FindOne() (domains.Store, error) {
 		return store, errors.New("Data not found")
 	}
 
-	image, err := customstorage.GetFileImage("assets/image/store/", store.Image)
+	image, err := customstorage.GetFileImage("asset/image/store/", store.Image)
 	if err != nil {
 		return store, err
 	}
@@ -60,7 +60,7 @@ func (u *usecase) Create(input store.CreateInput) (domains.Store, error) {
 		return dataStore, errors.New("Image is required")
 	}
 
-	image, err := customstorage.Upload("assets/image/store", "logo", input.Image)
+	image, err := customstorage.Upload("asset/image/store", "logo", input.Image)
 
 	dataStore.Image = image
 
@@ -86,7 +86,7 @@ func (u *usecase) Update(input store.CreateInput) (domains.Store, error) {
 		store.Name = input.Name
 	}
 	if input.Image != "" {
-		path := "assets/image/store/"
+		path := "asset/image/store/"
 
 		err = customstorage.Delete(path, store.Image)
 		if err != nil {
