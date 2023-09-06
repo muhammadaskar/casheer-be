@@ -66,7 +66,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	loggedInUser, err := h.userUseCase.Login(input)
 	if err != nil {
-		errMessage := gin.H{"errors": err.Error()}
+		errMessage := gin.H{"errors": "username or password doesnt match"}
 		response := customresponse.APIResponse("Login Failed", http.StatusBadRequest, "error", errMessage)
 		c.JSON(http.StatusBadRequest, response)
 		return
