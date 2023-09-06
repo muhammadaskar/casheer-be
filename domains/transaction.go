@@ -49,3 +49,7 @@ type CustomTransactionAmount struct {
 type CustomTransactionTotalQuantity struct {
 	TotalQuantity int `json:"total_quantity"`
 }
+
+type GetInputIdTransaction struct {
+	ID int `uri:"id" binding:"required"`
+}

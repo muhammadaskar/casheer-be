@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	FindAll() ([]domains.CustomTransaction, error)
 	FindAllMember() ([]domains.CustomTransactionMember, error)
+	FindById(id int) (domains.CustomTransaction, error)
 	GetAmountOneMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionAmount, error)
 	GetItemOneOutMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionTotalQuantity, error)
 	Create(transaction domains.Transaction) (domains.Transaction, error)
@@ -54,6 +55,20 @@ func (r *repository) FindAllMember() ([]domains.CustomTransactionMember, error) 
 		return transactions, err
 	}
 	return transactions, nil
+}
+
+func (r *repository) FindById(id int) (domains.CustomTransaction, error) {
+	var transaction domains.CustomTransaction
+
+	query := `SELECT transactions.id, member_code, transaction_code, transactions, total_quantity, amount, users.name as name, transactions.created_at 
+	FROM transactions
+	LEFT JOIN users ON transactions.user_id = users.id
+	WHERE transactions.id = ?`
+	err := r.db.Raw(query, id).Scan(&transaction).Error
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
 }
 
 func (r *repository) GetAmountOneMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionAmount, error) {
