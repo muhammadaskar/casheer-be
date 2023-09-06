@@ -1,7 +1,7 @@
 # Gunakan golang:latest sebagai base image
 FROM golang:latest
 
-# RUN chmod 777 ./assets/image/store
+RUN chmod 777 ./assets/image/store
 
 # Setel direktori kerja ke /app di dalam container
 WORKDIR /app
