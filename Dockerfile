@@ -4,7 +4,8 @@ FROM golang:latest
 # Setel direktori kerja ke /app di dalam container
 WORKDIR /app
 
-# update
+RUN mkdir -p ./assets/image/store
+
 COPY .env.example .env
 
 # Salin isi direktori saat ini ke direktori /app di dalam container
