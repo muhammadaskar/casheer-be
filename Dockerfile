@@ -4,6 +4,7 @@ FROM golang:latest
 # Setel direktori kerja ke /app di dalam container
 WORKDIR /app
 
+# update
 COPY .env.example .env
 
 # Salin isi direktori saat ini ke direktori /app di dalam container
