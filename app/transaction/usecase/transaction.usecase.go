@@ -21,6 +21,7 @@ type TransactionUseCase interface {
 	FindAll() ([]domains.CustomTransaction, error)
 	FindById(input domains.GetInputIdTransaction) (domains.CustomTransaction, error)
 	FindAllMember() ([]domains.CustomTransactionMember, error)
+	FindMemberById(input domains.GetInputIdTransaction) (domains.CustomTransactionMember, error)
 	GetAmountOneMonthAgo() (domains.CustomTransactionAmount, error)
 	GetItemOutOneMonthAgo() (domains.CustomTransactionTotalQuantity, error)
 	Create(input transaction.CreateInput) (domains.Transaction, error)
@@ -63,6 +64,23 @@ func (u *usecase) FindById(input domains.GetInputIdTransaction) (domains.CustomT
 	}
 	if transaction.ID == 0 {
 		return transaction, errors.New("Transaction not found")
+	}
+
+	return transaction, nil
+}
+
+func (u *usecase) FindMemberById(input domains.GetInputIdTransaction) (domains.CustomTransactionMember, error) {
+	transaction, err := u.transactionRepo.FindMemberById(input.ID)
+	if err != nil {
+		return transaction, err
+	}
+
+	if transaction.ID == 0 {
+		return transaction, errors.New("Transaction not found")
+	}
+
+	if transaction.MemberCode == "" {
+		return transaction, errors.New("Member not found")
 	}
 
 	return transaction, nil

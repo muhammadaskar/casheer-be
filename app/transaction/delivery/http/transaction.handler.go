@@ -66,6 +66,31 @@ func (h *TransactionHandler) FindById(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *TransactionHandler) FindMemberById(c *gin.Context) {
+	var input domains.GetInputIdTransaction
+
+	err := c.ShouldBindUri(&input)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to get transaction", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	transaction, err := h.transactionUseCase.FindMemberById(input)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := customresponse.APIResponse("Failed to get transactions", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get transactions", http.StatusOK, "success", transaction)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *TransactionHandler) GetAmountOneMonthAgo(c *gin.Context) {
 	transactions, err := h.transactionUseCase.GetAmountOneMonthAgo()
 	if err != nil {

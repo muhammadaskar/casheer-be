@@ -9,6 +9,7 @@ type Repository interface {
 	FindAll() ([]domains.CustomTransaction, error)
 	FindAllMember() ([]domains.CustomTransactionMember, error)
 	FindById(id int) (domains.CustomTransaction, error)
+	FindMemberById(id int) (domains.CustomTransactionMember, error)
 	GetAmountOneMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionAmount, error)
 	GetItemOneOutMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionTotalQuantity, error)
 	Create(transaction domains.Transaction) (domains.Transaction, error)
@@ -64,6 +65,21 @@ func (r *repository) FindById(id int) (domains.CustomTransaction, error) {
 	FROM transactions
 	LEFT JOIN users ON transactions.user_id = users.id
 	WHERE transactions.id = ?`
+	err := r.db.Raw(query, id).Scan(&transaction).Error
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
+}
+
+func (r *repository) FindMemberById(id int) (domains.CustomTransactionMember, error) {
+	var transaction domains.CustomTransactionMember
+
+	query := `SELECT transactions.id, transactions.member_code, members.name AS member_name, transaction_code, transactions, total_quantity, amount, users.name as name, transactions.created_at 
+	FROM transactions
+	INNER JOIN users ON transactions.user_id = users.id
+	INNER JOIN members ON transactions.member_code = members.member_code
+	WHERE transactions.id = ?;`
 	err := r.db.Raw(query, id).Scan(&transaction).Error
 	if err != nil {
 		return transaction, err
