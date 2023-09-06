@@ -5,15 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 func Upload(filePath string, fileName string, content string) (string, error) {
-	fileName = generateUUID() + ".png"
+	fileName += ".png"
 	decode, err := base64.StdEncoding.DecodeString(content)
 	if err != nil {
 		return fileName, err
@@ -79,18 +77,4 @@ func GetFileImage(path string, fileName string) (string, error) {
 
 func toBase64(b []byte) string {
 	return base64.StdEncoding.EncodeToString(b)
-}
-
-func generateUUID() string {
-	rand.Seed(time.Now().UnixNano())
-	length := 12
-
-	const availableChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	code := make([]byte, length)
-	for i := 0; i < length; i++ {
-		randomIndex := rand.Intn(len(availableChars))
-		code[i] = availableChars[randomIndex]
-	}
-
-	return string(code)
 }

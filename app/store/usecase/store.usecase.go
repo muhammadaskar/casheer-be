@@ -82,7 +82,9 @@ func (u *usecase) Update(input store.CreateInput) (domains.Store, error) {
 		return store, errors.New("Data not found")
 	}
 
-	store.Name = input.Name
+	if input.Name != "" {
+		store.Name = input.Name
+	}
 	if input.Image != "" {
 		path := "assets/image/store/"
 
