@@ -33,8 +33,6 @@ services:
       - "${SERVER_PORT_DEV}:${SERVER_PORT_DEV}"
     env_file:
       - .env
-    # volumes:
-    #   - .:/app
     restart: on-failure
 
 volumes:

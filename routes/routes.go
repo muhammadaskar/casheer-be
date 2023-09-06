@@ -81,6 +81,8 @@ func NewRouter() *gin.Engine {
 	config.AllowHeaders = []string{"Content-Type", "Authorization"}
 	config.AllowCredentials = true
 
+	gin.SetMode(gin.ReleaseMode)
+
 	router.Use(cors.New(config))
 
 	router.GET("/", func(c *gin.Context) {
