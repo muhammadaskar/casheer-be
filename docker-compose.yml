@@ -17,8 +17,8 @@ services:
 
   casheer-app:
     image: 'dev-casheer-be-image:latest'
-    volumes:
-      - ./assets:/app/assets
+    # volumes:
+    #   - ./assets:/app/assets
     depends_on:
       - mysql
     links:
