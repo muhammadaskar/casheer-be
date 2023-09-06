@@ -1,6 +1,8 @@
 # Gunakan golang:latest sebagai base image
 FROM golang:latest
 
+RUN apk update && apk add --no-cache git
+
 # Setel direktori kerja ke /app di dalam container
 WORKDIR /app
 
