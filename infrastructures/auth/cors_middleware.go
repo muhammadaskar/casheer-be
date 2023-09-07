@@ -15,12 +15,12 @@ func SetupCORS() gin.HandlerFunc {
 		log.Fatal("Error loading .env file")
 	}
 
-	allowOriginLocal := os.Getenv("ALLOW_ORIGIN_LOCAL")
+	// allowOriginLocal := os.Getenv("ALLOW_ORIGIN_LOCAL")
 	allowOriginDev := os.Getenv("ALLOW_ORIGIN_DEV")
 	allowOriginProd := os.Getenv("ALLOW_ORIGIN_PROD")
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{allowOriginLocal, allowOriginDev, allowOriginProd}
+	config.AllowOrigins = []string{allowOriginDev, allowOriginProd}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 	config.AllowHeaders = []string{"Content-Type", "Authorization"}
 	config.AllowCredentials = true
