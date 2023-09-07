@@ -27,6 +27,7 @@ pipeline {
                 // Use Jenkins environment variables to replace values in the .env file
                 sh "sed -i 's#ALLOW_ORIGIN_PROD=.*#ALLOW_ORIGIN_PROD=${ALLOW_ORIGIN_PROD}#' .env"
                 sh "sed -i 's#ALLOW_ORIGIN_DEV=.*#ALLOW_ORIGIN_DEV=${ALLOW_ORIGIN_DEV}#' .env"
+                sh "sed -i 's#ALLOW_ORIGIN_LOCAL=.*#ALLOW_ORIGIN_LOCAL=${ALLOW_ORIGIN_LOCAL}#' .env"
                 sh "sed -i 's/DB_HOST=.*/DB_HOST=${DB_HOST}/' .env"
                 sh "sed -i 's/DB_PORT=.*/DB_PORT=${DB_PORT}/' .env"
                 sh "sed -i 's/DB_USER=.*/DB_USER=${DB_USER}/' .env"

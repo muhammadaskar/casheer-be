@@ -2,9 +2,12 @@ package auth
 
 import (
 	"errors"
+	"log"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
 )
 
 type JWTAuthentication interface {
@@ -22,11 +25,15 @@ type customToken struct {
 	jwt.StandardClaims
 }
 
-var SECRET_KEY = []byte("s3cr3T_k3Y")
-
 func NewJWTAuth() *jwtAuth {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	return &jwtAuth{}
 }
+
+var SECRET_KEY = []byte(os.Getenv("SECRET_KEY"))
 
 func (j *jwtAuth) GenerateToken(userID int, email string, role int) (string, error) {
 	exp := time.Now().Add(24 * time.Hour).Unix()
@@ -54,7 +61,7 @@ func (j *jwtAuth) ValidateToken(encodedToken string) (*jwt.Token, error) {
 			return nil, errors.New("Invalid token")
 		}
 
-		return []byte(SECRET_KEY), nil
+		return SECRET_KEY, nil
 	})
 
 	if err != nil {

@@ -1,11 +1,7 @@
 package routes
 
 import (
-	"log"
-
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	categoryDelivery "github.com/muhammadaskar/casheer-be/app/category/delivery/http"
 	categoryRepo "github.com/muhammadaskar/casheer-be/app/category/repository/mysql"
 	categoryUseCase "github.com/muhammadaskar/casheer-be/app/category/usecase"
@@ -38,11 +34,6 @@ func NewRouter() *gin.Engine {
 	router := gin.Default()
 	db := mysql_driver.InitDatabase()
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	userRepository := userRepo.NewRepository(db)
 	notificationRepository := notificationRepo.NewRepository(db)
 	categoryRepository := categoryRepo.NewRepository(db)
@@ -74,16 +65,10 @@ func NewRouter() *gin.Engine {
 	authMiddleware := auth.AuthMiddleware(authentication, userUseCase)
 	authAdminMiddleware := auth.AuthAdminMiddleware(authentication, userUseCase)
 
-	// CORS MIDDLEWARE
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://38.47.69.131:2000", "http://127.0.0.1:2000"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
-	config.AllowHeaders = []string{"Content-Type", "Authorization"}
-	config.AllowCredentials = true
-
 	gin.SetMode(gin.ReleaseMode)
 
-	router.Use(cors.New(config))
+	// CORS MIDDLEWARE
+	router.Use(auth.SetupCORS())
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
