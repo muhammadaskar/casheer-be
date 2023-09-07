@@ -10,6 +10,7 @@ type Repository interface {
 	FindByEmail(email string) (domains.User, error)
 	FindByUsername(username string) (domains.User, error)
 	FindById(ID int) (domains.User, error)
+	GetUserCasheers() ([]domains.CustomUser, error)
 	GetTotalCasheer() (domains.CustomTotalCasheer, error)
 	Update(user domains.User) (domains.User, error)
 }
@@ -63,6 +64,19 @@ func (r *repository) FindById(ID int) (domains.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *repository) GetUserCasheers() ([]domains.CustomUser, error) {
+	var casheers []domains.CustomUser
+	query := `SELECT id, name, username, email, created_at, updated_at
+				FROM users
+				WHERE role = 1
+				AND is_active = 0`
+	err := r.db.Raw(query).Scan(&casheers).Error
+	if err != nil {
+		return casheers, err
+	}
+	return casheers, nil
 }
 
 func (r *repository) GetTotalCasheer() (domains.CustomTotalCasheer, error) {

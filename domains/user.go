@@ -5,15 +5,24 @@ import (
 )
 
 type User struct {
-	ID        int
-	Name      string
-	Username  string
-	Email     string
-	Password  string
-	Role      int
-	IsActive  int
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	Role      int       `json:"role"`
+	IsActive  int       `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type CustomUser struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type CustomTotalCasheer struct {

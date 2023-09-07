@@ -17,6 +17,7 @@ type UserUseCase interface {
 	IsEmailAvailable(email string) (bool, error)
 	IsUsernameAvailable(username string) (bool, error)
 	GetUserById(ID int) (domains.User, error)
+	GetUserCasheers() ([]domains.CustomUser, error)
 	GetTotalCasheer() (domains.CustomTotalCasheer, error)
 	Accept(inputID user.GetUserIDInput) (domains.User, error)
 	Reject(inputID user.GetUserIDInput) (domains.User, error)
@@ -114,6 +115,14 @@ func (u *usecase) Login(input user.LoginInput) (domains.User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *usecase) GetUserCasheers() ([]domains.CustomUser, error) {
+	casheers, err := u.userRepository.GetUserCasheers()
+	if err != nil {
+		return casheers, err
+	}
+	return casheers, nil
 }
 
 func (u *usecase) GetTotalCasheer() (domains.CustomTotalCasheer, error) {

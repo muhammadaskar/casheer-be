@@ -148,6 +148,8 @@ func NewRouter() *gin.Engine {
 		api.GET("/store", storeHandler.FindOne)
 		api.POST("/store", authAdminMiddleware, storeHandler.Create)
 		api.PUT("/store", authAdminMiddleware, storeHandler.Update)
+
+		api.GET("/users", authAdminMiddleware, userHandler.GetUserCasheers)
 	}
 
 	return router

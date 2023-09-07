@@ -85,6 +85,18 @@ func (h *UserHandler) Login(c *gin.Context) {
 	return
 }
 
+func (h *UserHandler) GetUserCasheers(c *gin.Context) {
+	casheers, err := h.userUseCase.GetUserCasheers()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get users", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get users", http.StatusOK, "success", casheers)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *UserHandler) GetTotalCasheer(c *gin.Context) {
 	casheer, err := h.userUseCase.GetTotalCasheer()
 	if err != nil {
