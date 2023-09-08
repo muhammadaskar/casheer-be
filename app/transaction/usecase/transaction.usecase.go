@@ -24,6 +24,7 @@ type TransactionUseCase interface {
 	FindMemberById(input domains.GetInputIdTransaction) (domains.CustomTransactionMember, error)
 	GetAmountOneMonthAgo() (domains.CustomTransactionAmount, error)
 	GetItemOutOneMonthAgo() (domains.CustomTransactionTotalQuantity, error)
+	GetCountTransactionThisYear() ([]domains.GetCountTransactionThisYear, error)
 	Create(input transaction.CreateInput) (domains.Transaction, error)
 }
 
@@ -116,6 +117,24 @@ func (u *usecase) GetItemOutOneMonthAgo() (domains.CustomTransactionTotalQuantit
 		return transaction, err
 	}
 	return transaction, nil
+}
+
+func (u *usecase) GetCountTransactionThisYear() ([]domains.GetCountTransactionThisYear, error) {
+	thisYear := time.Now().Year()
+	start := strconv.Itoa(thisYear) + "-01-01 00:00:00.00"
+	end := strconv.Itoa(thisYear) + "-12-31 23:59:00.00"
+
+	transactions, err := u.transactionRepo.GetCountTransactionThisYear(start, end)
+	if err != nil {
+		return transactions, err
+	}
+
+	months := []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+	for i := range transactions {
+		transactions[i].Month = months[i]
+	}
+
+	return transactions, nil
 }
 
 func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, error) {

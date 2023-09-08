@@ -115,6 +115,18 @@ func (h *TransactionHandler) GetItemOutOneMonthAgo(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *TransactionHandler) GetCountTransactionThisYear(c *gin.Context) {
+	transactions, err := h.transactionUseCase.GetCountTransactionThisYear()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get count transaction for this year", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get count transaction for this year", http.StatusOK, "success", transactions)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	var input transaction.CreateInput
 

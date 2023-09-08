@@ -12,6 +12,7 @@ type Repository interface {
 	FindMemberById(id int) (domains.CustomTransactionMember, error)
 	GetAmountOneMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionAmount, error)
 	GetItemOneOutMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionTotalQuantity, error)
+	GetCountTransactionThisYear(start string, end string) ([]domains.GetCountTransactionThisYear, error)
 	Create(transaction domains.Transaction) (domains.Transaction, error)
 }
 
@@ -113,4 +114,38 @@ func (r *repository) GetItemOneOutMonthAgo(currentTime string, oneMonthAgo strin
 		return transaction, err
 	}
 	return transaction, nil
+}
+
+func (r *repository) GetCountTransactionThisYear(start string, end string) ([]domains.GetCountTransactionThisYear, error) {
+	var transactions []domains.GetCountTransactionThisYear
+
+	query := `SELECT months.month AS Month,
+				IFNULL(SUM(p.count), 0) AS count
+			FROM (
+				SELECT 1 AS month
+				UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
+				UNION SELECT 5 UNION SELECT 6 UNION SELECT 7
+				UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+				UNION SELECT 11 UNION SELECT 12
+			) AS months
+			LEFT JOIN (
+				SELECT
+					DATE_FORMAT(created_at, '%m') AS month,
+					COUNT(*) AS count
+				FROM
+					transactions
+				WHERE
+					created_at >= ?
+					AND created_at <= ?
+				GROUP BY
+					month
+			) AS p ON months.month = p.month
+			GROUP BY
+				months.month;`
+
+	err := r.db.Raw(query, start, end).Scan(&transactions).Error
+	if err != nil {
+		return transactions, err
+	}
+	return transactions, nil
 }

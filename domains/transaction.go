@@ -53,3 +53,8 @@ type CustomTransactionTotalQuantity struct {
 type GetInputIdTransaction struct {
 	ID int `uri:"id" binding:"required"`
 }
+
+type GetCountTransactionThisYear struct {
+	Month string `json:"month"`
+	Count int    `json:"count"`
+}
