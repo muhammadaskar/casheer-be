@@ -128,6 +128,8 @@ func NewRouter() *gin.Engine {
 		api.GET("/transaction/amount/this-year", authMiddleware, transactionHandler.GetAmountTransactionThisYear)
 		api.POST("/transaction", authMiddleware, transactionHandler.CreateTransaction)
 
+		api.GET("/users", authAdminMiddleware, userHandler.GetUserCasheers)
+		api.GET("/users/unprocess-or-reject", authAdminMiddleware, userHandler.GetUsersUnprocessOrReject)
 		api.PUT("/user/activate/:id", authAdminMiddleware, userHandler.Activate)
 		api.PUT("/user/reject/:id", authAdminMiddleware, userHandler.Reject)
 		api.GET("/user/total-casheer", authAdminMiddleware, userHandler.GetTotalCasheer)
@@ -136,7 +138,6 @@ func NewRouter() *gin.Engine {
 		api.POST("/store", authAdminMiddleware, storeHandler.Create)
 		api.PUT("/store", authAdminMiddleware, storeHandler.Update)
 
-		api.GET("/users", authAdminMiddleware, userHandler.GetUserCasheers)
 	}
 
 	return router
