@@ -16,7 +16,7 @@ services:
       retries: 3
 
   casheer-app:
-    image: 'dev-casheer-be-image:latest'
+    image: 'prod-casheer-be-image:latest'
     # volumes:
     #   - ./assets:/app/assets
     depends_on:
@@ -30,7 +30,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
     ports:
-      - "${SERVER_PORT_DEV}:${SERVER_PORT_DEV}"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
       - .env
     restart: on-failure

@@ -31,7 +31,7 @@ pipeline {
                 sh "sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/' .env"
                 sh "sed -i 's/DB_NAME=.*/DB_NAME=${DB_NAME}/' .env"
                 sh "sed -i 's/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/' .env"
-                sh "sed -i 's/SERVER_PORT_DEV=.*/SERVER_PORT_DEV=${SERVER_PORT_DEV}/' .env"
+                sh "sed -i 's/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT}/' .env"
             }
         }
         
