@@ -120,16 +120,36 @@ func (u *usecase) GetItemOutOneMonthAgo() (domains.CustomTransactionTotalQuantit
 }
 
 func (u *usecase) GetCountTransactionThisYear() ([]domains.GetCountTransactionThisYear, error) {
-	thisYear := time.Now().Year()
-	start := strconv.Itoa(thisYear) + "-01-01 00:00:00.00"
-	end := strconv.Itoa(thisYear) + "-12-31 23:59:00.00"
+	now := time.Now()
+	currentYear := now.Year()
+	currentMonth := now.Month()
+	start := strconv.Itoa(currentYear) + "-01-01 00:00:00.00"
+	end := strconv.Itoa(currentYear) + "-12-31 23:59:00.00"
 
 	transactions, err := u.transactionRepo.GetCountTransactionThisYear(start, end)
 	if err != nil {
 		return transactions, err
 	}
 
+	currentMonthInt := int(currentMonth)
+
 	months := []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+
+	var filteredTransactions []domains.GetCountTransactionThisYear
+	for _, transaction := range transactions {
+		month, err := strconv.Atoi(transaction.Month)
+		if err != nil {
+			// Handle kesalahan konversi jika diperlukan
+			continue
+		}
+
+		if month <= currentMonthInt {
+			filteredTransactions = append(filteredTransactions, transaction)
+		}
+	}
+
+	transactions = filteredTransactions
+
 	for i := range transactions {
 		transactions[i].Month = months[i]
 	}
