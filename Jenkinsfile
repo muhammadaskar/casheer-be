@@ -8,12 +8,12 @@ pipeline {
             }
         }
         
-        stage('Stop Docker Compose') {
-            steps {
-                echo 'Stopping the running compose...'
-                sh 'docker-compose down'
-            }
-        }
+        // stage('Stop Docker Compose') {
+        //     steps {
+        //         echo 'Stopping the running compose...'
+        //         sh 'docker-compose down'
+        //     }
+        // }
 
         stage('Copy .env.example to .env') {
             steps {
@@ -52,7 +52,7 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 echo 'Deploying with Docker Compose...'
-                sh 'docker-compose -f docker-compose.yml up -d'
+                sh 'docker-compose -f docker-compose-prod.yml up -d'
                 echo 'docker ps'
             }
         }
