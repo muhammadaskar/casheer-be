@@ -124,7 +124,8 @@ func NewRouter() *gin.Engine {
 		api.GET("/transaction/member/:id", authMiddleware, transactionHandler.FindMemberById)
 		api.GET("/transaction/amount", authMiddleware, transactionHandler.GetAmountOneMonthAgo)
 		api.GET("/transaction/item-out", authMiddleware, transactionHandler.GetItemOutOneMonthAgo)
-		api.GET("/transaction/this-year", authMiddleware, transactionHandler.GetCountTransactionThisYear)
+		api.GET("/transaction/count/this-year", authMiddleware, transactionHandler.GetCountTransactionThisYear)
+		api.GET("/transaction/amount/this-year", authMiddleware, transactionHandler.GetAmountTransactionThisYear)
 		api.POST("/transaction", authMiddleware, transactionHandler.CreateTransaction)
 
 		api.PUT("/user/activate/:id", authAdminMiddleware, userHandler.Activate)

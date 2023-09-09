@@ -13,6 +13,7 @@ type Repository interface {
 	GetAmountOneMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionAmount, error)
 	GetItemOneOutMonthAgo(currentTime string, oneMonthAgo string) (domains.CustomTransactionTotalQuantity, error)
 	GetCountTransactionThisYear(start string, end string) ([]domains.GetCountTransactionThisYear, error)
+	GetAmountTransactionThisYear(start string, end string) ([]domains.GetAmountTransactionThisYear, error)
 	Create(transaction domains.Transaction) (domains.Transaction, error)
 }
 
@@ -132,6 +133,40 @@ func (r *repository) GetCountTransactionThisYear(start string, end string) ([]do
 				SELECT
 					DATE_FORMAT(created_at, '%m') AS month,
 					COUNT(*) AS count
+				FROM
+					transactions
+				WHERE
+					created_at >= ?
+					AND created_at <= ?
+				GROUP BY
+					month
+			) AS p ON months.month = p.month
+			GROUP BY
+				months.month;`
+
+	err := r.db.Raw(query, start, end).Scan(&transactions).Error
+	if err != nil {
+		return transactions, err
+	}
+	return transactions, nil
+}
+
+func (r *repository) GetAmountTransactionThisYear(start string, end string) ([]domains.GetAmountTransactionThisYear, error) {
+	var transactions []domains.GetAmountTransactionThisYear
+
+	query := `SELECT months.month AS Month,
+				IFNULL(SUM(p.amount), 0) AS amount
+			FROM (
+				SELECT 1 AS month
+				UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
+				UNION SELECT 5 UNION SELECT 6 UNION SELECT 7
+				UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+				UNION SELECT 11 UNION SELECT 12
+			) AS months
+			LEFT JOIN (
+				SELECT
+					DATE_FORMAT(created_at, '%m') AS month,
+					SUM(amount) AS amount
 				FROM
 					transactions
 				WHERE

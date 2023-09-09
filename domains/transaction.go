@@ -58,3 +58,8 @@ type GetCountTransactionThisYear struct {
 	Month string `json:"month"`
 	Count int    `json:"count"`
 }
+
+type GetAmountTransactionThisYear struct {
+	Month  string `json:"month"`
+	Amount int    `json:"amount"`
+}

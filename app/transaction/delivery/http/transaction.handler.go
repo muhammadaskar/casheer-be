@@ -127,6 +127,18 @@ func (h *TransactionHandler) GetCountTransactionThisYear(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *TransactionHandler) GetAmountTransactionThisYear(c *gin.Context) {
+	transactions, err := h.transactionUseCase.GetAmountTransactionThisYear()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get amount transaction for this year", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get amount transaction for this year", http.StatusOK, "success", transactions)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	var input transaction.CreateInput
 

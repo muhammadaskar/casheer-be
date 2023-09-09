@@ -25,6 +25,7 @@ type TransactionUseCase interface {
 	GetAmountOneMonthAgo() (domains.CustomTransactionAmount, error)
 	GetItemOutOneMonthAgo() (domains.CustomTransactionTotalQuantity, error)
 	GetCountTransactionThisYear() ([]domains.GetCountTransactionThisYear, error)
+	GetAmountTransactionThisYear() ([]domains.GetAmountTransactionThisYear, error)
 	Create(input transaction.CreateInput) (domains.Transaction, error)
 }
 
@@ -133,9 +134,47 @@ func (u *usecase) GetCountTransactionThisYear() ([]domains.GetCountTransactionTh
 
 	currentMonthInt := int(currentMonth)
 
-	months := []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+	months := []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 
 	var filteredTransactions []domains.GetCountTransactionThisYear
+	for _, transaction := range transactions {
+		month, err := strconv.Atoi(transaction.Month)
+		if err != nil {
+			// Handle kesalahan konversi jika diperlukan
+			continue
+		}
+
+		if month <= currentMonthInt {
+			filteredTransactions = append(filteredTransactions, transaction)
+		}
+	}
+
+	transactions = filteredTransactions
+
+	for i := range transactions {
+		transactions[i].Month = months[i]
+	}
+
+	return transactions, nil
+}
+
+func (u *usecase) GetAmountTransactionThisYear() ([]domains.GetAmountTransactionThisYear, error) {
+	now := time.Now()
+	currentYear := now.Year()
+	currentMonth := now.Month()
+	start := strconv.Itoa(currentYear) + "-01-01 00:00:00.00"
+	end := strconv.Itoa(currentYear) + "-12-31 23:59:00.00"
+
+	transactions, err := u.transactionRepo.GetAmountTransactionThisYear(start, end)
+	if err != nil {
+		return transactions, err
+	}
+
+	currentMonthInt := int(currentMonth)
+
+	months := []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+
+	var filteredTransactions []domains.GetAmountTransactionThisYear
 	for _, transaction := range transactions {
 		month, err := strconv.Atoi(transaction.Month)
 		if err != nil {
