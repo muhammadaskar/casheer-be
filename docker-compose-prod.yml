@@ -6,7 +6,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
     ports:
-      - "3309:3306"
+      - "3309:3309"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
