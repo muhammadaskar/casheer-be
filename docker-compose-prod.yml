@@ -3,7 +3,7 @@ services:
   mysql:
     image: mysql:8.0.31
     environment:
-      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: default
       MYSQL_DATABASE: db_prod_casheer
     ports:
       - "3309:3306"
@@ -25,9 +25,9 @@ services:
       - mysql
     environment:
       DB_HOST: mysql
-      DB_PORT: 3309
+      DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: secret
+      DB_PASSWORD: default
       DB_NAME: db_prod_casheer
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
