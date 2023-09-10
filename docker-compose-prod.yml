@@ -8,7 +8,7 @@ services:
     ports:
       - "3309:3306"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql-prod
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
@@ -25,7 +25,7 @@ services:
       - mysql
     environment:
       DB_HOST: mysql
-      DB_PORT: 3306
+      DB_PORT: ${DB_PORT}
       DB_USER: root
       DB_PASSWORD: default
       DB_NAME: db_prod_casheer
