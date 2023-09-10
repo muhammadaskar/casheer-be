@@ -24,10 +24,10 @@ services:
     links:
       - mysql
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: prod-casheer-be-mysql-1
+      DB_PORT: 3309
+      DB_USER: root
+      DB_PASSWORD: default
       DB_NAME: db_prod_casheer
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
