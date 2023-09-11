@@ -14,6 +14,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - netwrok-production # Nama jaringan yang sama dengan jaringan aplikasi
 
   casheer-app:
     image: 'prod-casheer-be-image:latest'
@@ -34,6 +36,13 @@ services:
     env_file:
       - .env
     restart: on-failure
+    networks:
+      - netwrok-production # Nama jaringan yang sama dengan jaringan MySQL
+
+  networks:
+  netwrok-production:
+    # Nama jaringan yang sama dengan jaringan MySQL
+    driver: bridge # Anda dapat menggunakan driver jaringan yang sesuai dengan kebutuhan Anda
 
 volumes:
   mysql-data:
