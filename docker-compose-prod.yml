@@ -40,9 +40,9 @@ services:
       - network-production # Nama jaringan yang sama dengan jaringan MySQL
 
 networks:
-network-production:
-  # Nama jaringan yang sama dengan jaringan MySQL
-  driver: bridge # Anda dapat menggunakan driver jaringan yang sesuai dengan kebutuhan Anda
+  network-production:
+    # Nama jaringan yang sama dengan jaringan MySQL
+    driver: bridge # Anda dapat menggunakan driver jaringan yang sesuai dengan kebutuhan Anda
 
 volumes:
   mysql-data:
