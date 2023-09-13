@@ -4,7 +4,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: db_prod_casheer
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
       - "3306:3306"
     volumes:
@@ -27,10 +27,10 @@ services:
       - mysql
     environment:
       DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: default
-      DB_NAME: db_prod_casheer
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
