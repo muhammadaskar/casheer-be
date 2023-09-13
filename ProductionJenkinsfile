@@ -8,10 +8,10 @@ pipeline {
             }
         }
         
-        stage('Stop Docker Compose') {
+        stage('Stop Docker Container') {
             steps {
-                echo 'Stopping the running compose...'
-                sh 'docker-compose down || true'
+                echo 'Stopping the running container...'
+                sh 'docker stop prod-casheer-be-container || true'
             }
         }
 
@@ -25,10 +25,10 @@ pipeline {
         stage('Set Environment Variables') {
             steps {
                 // Use Jenkins environment variables to replace values in the .env file
-                sh "sed -i 's/DB_HOST=.*/DB_HOST=${DB_HOST_PROD}/' .env"
-                sh "sed -i 's/DB_PORT=.*/DB_PORT=${DB_PORT_PROD}/' .env"
-                sh "sed -i 's/DB_USER=.*/DB_USER=${DB_USER_PROD}/' .env"
-                sh "sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD_PROD}/' .env"
+                sh "sed -i 's/DB_HOST=.*/DB_HOST=${DB_HOST}/' .env"
+                sh "sed -i 's/DB_PORT=.*/DB_PORT=${DB_PORT}/' .env"
+                sh "sed -i 's/DB_USER=.*/DB_USER=${DB_USER}/' .env"
+                sh "sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/' .env"
                 sh "sed -i 's/DB_NAME=.*/DB_NAME=${DB_NAME_PROD}/' .env"
                 sh "sed -i 's/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY_PROD}/' .env"
                 sh "sed -i 's/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT_PROD}/' .env"
@@ -49,10 +49,10 @@ pipeline {
             }
         }
         
-        stage('Deploy with Docker Compose') {
+        stage('Deploy with Container Run') {
             steps {
-                echo 'Deploying with Docker Compose...'
-                sh 'docker-compose -f docker-compose-prod.yml up -d'
+                echo 'Deploying with Docker Container Run...'
+                sh 'docker run -d -p ${SERVER_PORT}:${SERVER_PORT} --name prod-casheer-be-container prod-casheer-be-image:latest'
                 echo 'docker ps'
             }
         }

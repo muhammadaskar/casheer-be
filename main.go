@@ -14,7 +14,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	port := os.Getenv("SERVER_PORT_DEV")
+	port := os.Getenv("SERVER_PORT")
 	router := routes.NewRouter()
 	router.Run(":" + port)
 }

@@ -8,10 +8,10 @@ pipeline {
             }
         }
         
-        stage('Stop Docker Compose') {
+        stage('Stop Docker Container') {
             steps {
-                echo 'Stopping the running compose...'
-                sh 'docker-compose down'
+                echo 'Stopping the running container...'
+                sh 'docker stop dev-casheer-be-container || true'
             }
         }
 
@@ -31,7 +31,7 @@ pipeline {
                 sh "sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/' .env"
                 sh "sed -i 's/DB_NAME=.*/DB_NAME=${DB_NAME}/' .env"
                 sh "sed -i 's/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/' .env"
-                sh "sed -i 's/SERVER_PORT_DEV=.*/SERVER_PORT_DEV=${SERVER_PORT_DEV}/' .env"
+                sh "sed -i 's/SERVER_PORT=.*/SERVER_PORT=${SERVER_PORT_DEV}/' .env"
             }
         }
         
@@ -49,10 +49,10 @@ pipeline {
             }
         }
         
-        stage('Deploy with Docker Compose') {
+        stage('Deploy with Container Run') {
             steps {
-                echo 'Deploying with Docker Compose...'
-                sh 'docker-compose -f docker-compose.yml up -d'
+                echo 'Deploying with Docker Container Run...'
+                sh 'docker run -d -p ${SERVER_PORT}:${SERVER_PORT} --name dev-casheer-be-container dev-casheer-be-image:latest'
                 echo 'docker ps'
             }
         }

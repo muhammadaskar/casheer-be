@@ -6,7 +6,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: db_prod_casheer
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mysql-data-prod:/var/lib/mysql-data-prod
     healthcheck:
