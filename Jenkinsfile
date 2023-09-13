@@ -8,10 +8,11 @@ pipeline {
             }
         }
         
-        stage('Stop Docker Container') {
+        stage('Stop Docker Container and Remove Container') {
             steps {
                 echo 'Stopping the running container...'
                 sh 'docker stop dev-casheer-be-container || true'
+                sh 'docker rm dev-casheer-be-container || true'
             }
         }
 
