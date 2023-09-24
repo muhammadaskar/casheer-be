@@ -133,6 +133,17 @@ func (u *usecase) FindById(input product.GetProductDetailInput) (domains.CustomR
 
 func (u *usecase) Create(input product.CreateInput) (domains.Product, error) {
 	product := domains.Product{}
+
+	productCode, err := u.productRepository.FindByProductCode(input.Code)
+	if err != nil {
+		return product, err
+	}
+
+	if productCode.ID != 0 {
+		return product, errors.New("Product code is available")
+	}
+
+	product.Code = input.Code
 	product.Name = input.Name
 	product.Price = input.Price
 	product.Quantity = input.Quantity
@@ -168,6 +179,18 @@ func (u *usecase) Update(inputID product.GetProductDetailInput, inputData produc
 		return product, errors.New("No product on that ID")
 	}
 
+	if inputData.Code != product.Code {
+		productCode, err := u.productRepository.FindByProductCode(inputData.Code)
+		if err != nil {
+			return product, err
+		}
+
+		if productCode.ID != 0 {
+			return product, errors.New("Product code is available")
+		}
+	}
+
+	product.Code = inputData.Code
 	product.Name = inputData.Name
 	product.Price = inputData.Price
 	product.Quantity = inputData.Quantity

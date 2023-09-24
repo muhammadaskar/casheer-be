@@ -11,6 +11,7 @@ type Repository interface {
 	Count() (int64, error)
 	FindById(id int) (domains.CustomResult, error)
 	FindByProductID(id int) (domains.Product, error)
+	FindByProductCode(id string) (domains.Product, error)
 	Create(product domains.Product) (domains.Product, error)
 	Update(product domains.Product) (domains.Product, error)
 	UpdateQty(id int, qty int) (domains.Product, error)
@@ -29,7 +30,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 
 	if noPagination == true {
 		queryString := "%" + search + "%"
-		query := `SELECT products.id, categories.id as category_id, products.name, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+		query := `SELECT products.id, products.code as code, categories.id as category_id, products.name, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 			FROM products
 			LEFT JOIN users ON products.user_id = users.id
 			LEFT JOIN categories ON products.category_id = categories.id
@@ -44,7 +45,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 		perPage := limit
 		offset := (page - 1) * perPage
 
-		query := `SELECT products.id, products.name, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+		query := `SELECT products.id, products.code as code, products.name, categories.id as category_id, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 				FROM products
 				LEFT JOIN users ON products.user_id = users.id
 				LEFT JOIN categories ON products.category_id = categories.id
@@ -64,7 +65,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 func (r *repository) GetAll() ([]domains.CustomProduct, error) {
 	var products []domains.CustomProduct
 
-	query := `SELECT products.id, products.name, products.price, products.quantity FROM products WHERE is_deleted = 1`
+	query := `SELECT products.id, products.code as code, products.name, products.price, products.quantity FROM products WHERE is_deleted = 1`
 
 	err := r.db.Raw(query).Scan(&products).Error
 
@@ -89,7 +90,7 @@ func (r *repository) Count() (int64, error) {
 func (r *repository) FindById(id int) (domains.CustomResult, error) {
 	var product domains.CustomResult
 
-	query := `SELECT products.id, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
+	query := `SELECT products.id, products.code as code, products.name, products.image, categories.name as category, products.price, products.quantity, users.name as created_by, products.entry_at, products.created_at
 	FROM products
 	LEFT JOIN users ON products.user_id = users.id
 	LEFT JOIN categories ON products.category_id = categories.id
@@ -105,6 +106,16 @@ func (r *repository) FindByProductID(id int) (domains.Product, error) {
 	var product domains.Product
 
 	err := r.db.Where("id = ?", id).Find(&product).Error
+	if err != nil {
+		return product, err
+	}
+	return product, nil
+}
+
+func (r *repository) FindByProductCode(code string) (domains.Product, error) {
+	var product domains.Product
+
+	err := r.db.Where("code = ?", code).Find(&product).Error
 	if err != nil {
 		return product, err
 	}

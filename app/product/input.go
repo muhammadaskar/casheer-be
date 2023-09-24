@@ -13,7 +13,7 @@ type GetProductsQueryInput struct {
 }
 
 type CreateInput struct {
-	// UserID     int    `json:"user_id" bind:"required"`
+	Code       string `json:"product_code" bind:"required,min=6"`
 	CategoryID int    `json:"category_id" bind:"required"`
 	Name       string `json:"name" bind:"required"`
 	Price      int    `json:"price" bind:"required"`

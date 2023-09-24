@@ -8,6 +8,7 @@ import (
 
 type Product struct {
 	ID          int
+	Code        string
 	UserID      int
 	CategoryID  int
 	Name        string
@@ -26,6 +27,7 @@ type Product struct {
 
 type CustomResult struct {
 	ID         uint      `json:"id"`
+	Code       string    `json:"code"`
 	CategoryID int       `json:"category_id"`
 	Name       string    `json:"name"`
 	Category   string    `json:"category"`
@@ -38,6 +40,7 @@ type CustomResult struct {
 
 type CustomProduct struct {
 	ID       uint    `json:"id"`
+	Code     string  `json:"code"`
 	Name     string  `json:"name"`
 	Price    float64 `json:"price"`
 	Quantity int     `json:"quantity"`
