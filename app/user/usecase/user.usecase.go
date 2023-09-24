@@ -22,6 +22,8 @@ type UserUseCase interface {
 	GetTotalCasheer() (domains.CustomTotalCasheer, error)
 	Accept(inputID user.GetUserIDInput) (domains.User, error)
 	Reject(inputID user.GetUserIDInput) (domains.User, error)
+	UpdateNameOrEmail(inputID int, inputData user.NameAndEmailInput) (domains.User, error)
+	UpdatePassword(inputID int, inputData user.PasswordInput) (domains.User, error)
 }
 
 type usecase struct {
@@ -116,6 +118,69 @@ func (u *usecase) Login(input user.LoginInput) (domains.User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *usecase) UpdateNameOrEmail(inputID int, inputData user.NameAndEmailInput) (domains.User, error) {
+	user, err := u.userRepository.FindById(inputID)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("No user found")
+	}
+
+	user.Name = inputData.Name
+
+	if inputData.Email != user.Email {
+		email, err := u.userRepository.FindByEmail(inputData.Email)
+		if err != nil {
+			return user, err
+		}
+
+		if email.ID != 0 {
+			return user, errors.New("Email is available")
+		}
+	}
+
+	user.Email = inputData.Email
+
+	updateUser, err := u.userRepository.Update(user)
+	if err != nil {
+		return updateUser, err
+	}
+
+	return updateUser, nil
+}
+
+func (u *usecase) UpdatePassword(inputID int, inputData user.PasswordInput) (domains.User, error) {
+	user, err := u.userRepository.FindById(inputID)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("No user found")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(inputData.CurrentPassword))
+	if err != nil {
+		return user, errors.New("Current password dosnt match")
+	}
+
+	if inputData.CurrentPassword == inputData.NewPassword {
+		return user, errors.New("Your new password cannot be the same as your old password")
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(inputData.NewPassword), bcrypt.MinCost)
+	user.Password = string(passwordHash)
+
+	updateUser, err := u.userRepository.Update(user)
+	if err != nil {
+		return updateUser, err
+	}
+
+	return updateUser, nil
 }
 
 func (u *usecase) GetUserCasheers() ([]domains.CustomUser, error) {

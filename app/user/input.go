@@ -19,3 +19,13 @@ type CheckEmailInput struct {
 type GetUserIDInput struct {
 	ID int `uri:"id" binding:"required"`
 }
+
+type NameAndEmailInput struct {
+	Name  string `json:"name" binding:"required,min=5"`
+	Email string `json:"email" binding:"required"`
+}
+
+type PasswordInput struct {
+	CurrentPassword string `json:"current_password" binding:"required"`
+	NewPassword     string `json:"new_password" binding:"required"`
+}

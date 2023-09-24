@@ -133,6 +133,8 @@ func NewRouter() *gin.Engine {
 		api.PUT("/user/activate/:id", authAdminMiddleware, userHandler.Activate)
 		api.PUT("/user/reject/:id", authAdminMiddleware, userHandler.Reject)
 		api.GET("/user/total-casheer", authAdminMiddleware, userHandler.GetTotalCasheer)
+		api.PUT("/user/update/name-or-email", authMiddleware, userHandler.UpdateNameOrEmail)
+		api.PUT("/user/update/password", authMiddleware, userHandler.UpdatePassword)
 
 		api.GET("/store", storeHandler.FindOne)
 		api.POST("/store", authAdminMiddleware, storeHandler.Create)

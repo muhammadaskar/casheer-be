@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/muhammadaskar/casheer-be/app/user"
 	"github.com/muhammadaskar/casheer-be/app/user/usecase"
+	"github.com/muhammadaskar/casheer-be/domains"
 	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
 	customresponse "github.com/muhammadaskar/casheer-be/utils/custom_response"
 )
@@ -85,6 +86,62 @@ func (h *UserHandler) Login(c *gin.Context) {
 	response := customresponse.APIResponse("Successfully loggedin", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 	return
+}
+
+func (h *UserHandler) UpdateNameOrEmail(c *gin.Context) {
+	var inputData user.NameAndEmailInput
+	err := c.ShouldBindJSON(&inputData)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Update user failed", http.StatusUnprocessableEntity, "error", errMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(domains.User)
+
+	updateUser, err := h.userUseCase.UpdateNameOrEmail(currentUser.ID, inputData)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := customresponse.APIResponse("Update user failed", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	dataUser := gin.H{"name": updateUser.Name, "email": updateUser.Email}
+
+	response := customresponse.APIResponse("Success to update user", http.StatusOK, "success", dataUser)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *UserHandler) UpdatePassword(c *gin.Context) {
+	var inputData user.PasswordInput
+	err := c.ShouldBindJSON(&inputData)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Update user failed", http.StatusUnprocessableEntity, "error", errMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(domains.User)
+
+	updateUser, err := h.userUseCase.UpdatePassword(currentUser.ID, inputData)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := customresponse.APIResponse("Update user failed", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	dataUser := gin.H{"name": updateUser.Name, "email": updateUser.Email}
+
+	response := customresponse.APIResponse("Success to update password", http.StatusOK, "success", dataUser)
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) GetUserCasheers(c *gin.Context) {
