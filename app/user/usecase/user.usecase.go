@@ -18,7 +18,8 @@ type UserUseCase interface {
 	IsUsernameAvailable(username string) (bool, error)
 	GetUserById(ID int) (domains.User, error)
 	GetUserCasheers() ([]domains.CustomUser, error)
-	GetUsersUnprocessOrReject() ([]domains.CustomUser, error)
+	GetUsersUnprocess() ([]domains.CustomUser, error)
+	GetUsersRejected() ([]domains.CustomUser, error)
 	GetTotalCasheer() (domains.CustomTotalCasheer, error)
 	Accept(inputID user.GetUserIDInput) (domains.User, error)
 	Reject(inputID user.GetUserIDInput) (domains.User, error)
@@ -191,8 +192,16 @@ func (u *usecase) GetUserCasheers() ([]domains.CustomUser, error) {
 	return casheers, nil
 }
 
-func (u *usecase) GetUsersUnprocessOrReject() ([]domains.CustomUser, error) {
-	casheers, err := u.userRepository.GetUsersUnprocessOrReject()
+func (u *usecase) GetUsersUnprocess() ([]domains.CustomUser, error) {
+	casheers, err := u.userRepository.GetUsersUnprocess()
+	if err != nil {
+		return casheers, err
+	}
+	return casheers, nil
+}
+
+func (u *usecase) GetUsersRejected() ([]domains.CustomUser, error) {
+	casheers, err := u.userRepository.GetUsersRejected()
 	if err != nil {
 		return casheers, err
 	}

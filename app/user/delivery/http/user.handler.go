@@ -156,8 +156,20 @@ func (h *UserHandler) GetUserCasheers(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *UserHandler) GetUsersUnprocessOrReject(c *gin.Context) {
-	casheers, err := h.userUseCase.GetUsersUnprocessOrReject()
+func (h *UserHandler) GetUsersUnprocess(c *gin.Context) {
+	casheers, err := h.userUseCase.GetUsersUnprocess()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get users", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get users", http.StatusOK, "success", casheers)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *UserHandler) GetUsersRejected(c *gin.Context) {
+	casheers, err := h.userUseCase.GetUsersRejected()
 	if err != nil {
 		response := customresponse.APIResponse("Failed to get users", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)

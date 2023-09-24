@@ -11,7 +11,8 @@ type Repository interface {
 	FindByUsername(username string) (domains.User, error)
 	FindById(ID int) (domains.User, error)
 	GetUserCasheers() ([]domains.CustomUser, error)
-	GetUsersUnprocessOrReject() ([]domains.CustomUser, error)
+	GetUsersUnprocess() ([]domains.CustomUser, error)
+	GetUsersRejected() ([]domains.CustomUser, error)
 	GetTotalCasheer() (domains.CustomTotalCasheer, error)
 	Update(user domains.User) (domains.User, error)
 }
@@ -80,12 +81,25 @@ func (r *repository) GetUserCasheers() ([]domains.CustomUser, error) {
 	return casheers, nil
 }
 
-func (r *repository) GetUsersUnprocessOrReject() ([]domains.CustomUser, error) {
+func (r *repository) GetUsersUnprocess() ([]domains.CustomUser, error) {
 	var casheers []domains.CustomUser
 	query := `SELECT id, name, username, email, created_at, updated_at
 				FROM users
 				WHERE role = 1
-				AND (is_active = 1 OR is_active = -1)`
+				AND is_active = 1`
+	err := r.db.Raw(query).Scan(&casheers).Error
+	if err != nil {
+		return casheers, err
+	}
+	return casheers, nil
+}
+
+func (r *repository) GetUsersRejected() ([]domains.CustomUser, error) {
+	var casheers []domains.CustomUser
+	query := `SELECT id, name, username, email, created_at, updated_at
+				FROM users
+				WHERE role = 1
+				AND is_active = -1`
 	err := r.db.Raw(query).Scan(&casheers).Error
 	if err != nil {
 		return casheers, err
