@@ -33,6 +33,7 @@ type CustomResult struct {
 	Category   string    `json:"category"`
 	Price      float64   `json:"price"`
 	Quantity   int       `json:"quantity"`
+	IsDeleted  int       `json:"is_deleted"`
 	CreatedBy  string    `json:"created_by"`
 	EntryAt    time.Time `json:"entry_at"`
 	CreatedAt  time.Time `json:"created_at"`
