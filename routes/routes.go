@@ -73,7 +73,7 @@ func NewRouter() *gin.Engine {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": true,
-			"message": "hello world",
+			"message": "hello world!!!",
 		})
 	})
 
