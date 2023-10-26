@@ -20,7 +20,7 @@ func SetupCORS() gin.HandlerFunc {
 
 	config := cors.DefaultConfig()
 	// config.AllowOrigins = []string{allowOriginDev, allowOriginProd}
-	config.AllowOrigins = []string{"http://38.47.69.131:3000", "http://38.47.69.131:2000", "http://127.0.0.1:2000"}
+	config.AllowOrigins = []string{"http://38.47.69.131:3000", "http://38.47.69.131:2000", "http://127.0.0.1:2000", "http://38.47.69.131"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 	config.AllowHeaders = []string{"Content-Type", "Authorization"}
 	config.AllowCredentials = true
