@@ -242,7 +242,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 
 			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
-			total := pq.Quantity * product.Quantity
+			total := pq.Quantity * product.Price
 
 			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity), "price": strconv.Itoa(product.Price), "total": strconv.Itoa(total)})
 
@@ -298,7 +298,7 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 
 			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
-			total := pq.Quantity * product.Quantity
+			total := pq.Quantity * product.Price
 
 			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity), "price": strconv.Itoa(product.Price), "total": strconv.Itoa(total)})
 
