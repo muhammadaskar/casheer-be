@@ -65,7 +65,7 @@ func (u *usecase) FindById(input domains.GetInputIdTransaction) (domains.CustomT
 		return transaction, err
 	}
 	if transaction.ID == 0 {
-		return transaction, errors.New("TRANSACTION NOT FOUND")
+		return transaction, errors.New("Transaction not found")
 	}
 
 	return transaction, nil
@@ -78,11 +78,11 @@ func (u *usecase) FindMemberById(input domains.GetInputIdTransaction) (domains.C
 	}
 
 	if transaction.ID == 0 {
-		return transaction, errors.New("TRANSACTION NOT FOUND")
+		return transaction, errors.New("Transaction not found")
 	}
 
 	if transaction.MemberCode == "" {
-		return transaction, errors.New("MEMBER NOT FOUND")
+		return transaction, errors.New("Member not found")
 	}
 
 	return transaction, nil
@@ -209,11 +209,11 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 		}
 
 		if member.ID == 0 {
-			return transaction, errors.New("MEMBER CODE IS NOT AVAILABLE")
+			return transaction, errors.New("Member code is not available")
 		}
 
 		if member.IsActive != 0 {
-			return transaction, errors.New("MEMBER IS NOT ACTIVE")
+			return transaction, errors.New("Member is not active")
 		}
 
 		discount, err := u.discountRepo.FindById()
@@ -242,9 +242,8 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 
 			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
-			total := pq.Quantity * product.Price
 
-			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity), "price": strconv.Itoa(product.Price), "total": strconv.Itoa(total)})
+			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity)})
 
 			_, err = u.productRepo.Update(product)
 			if err != nil {
@@ -262,9 +261,6 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 		}
 
 		jsonBytes, err := json.Marshal(productData)
-		if err != nil {
-			return transaction, err
-		}
 		jsonString := string(jsonBytes)
 
 		transaction.Amount = totalAmount
@@ -301,7 +297,6 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 
 			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
-			// total := pq.Quantity * product.Price
 
 			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity)})
 
@@ -320,9 +315,6 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			totalQuantity += quantity.Quantity
 		}
 		jsonBytes, err := json.Marshal(productData)
-		// if err != nil {
-		// 	return transaction, err
-		// }
 		jsonString := string(jsonBytes)
 
 		transaction.Amount = totalAmount
