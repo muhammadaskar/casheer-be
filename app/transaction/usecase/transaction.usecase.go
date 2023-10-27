@@ -320,9 +320,9 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 			totalQuantity += quantity.Quantity
 		}
 		jsonBytes, err := json.Marshal(productData)
-		if err != nil {
-			return transaction, err
-		}
+		// if err != nil {
+		// 	return transaction, err
+		// }
 		jsonString := string(jsonBytes)
 
 		transaction.Amount = totalAmount
