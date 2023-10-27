@@ -242,8 +242,9 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 
 			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
+			total := pq.Quantity * product.Quantity
 
-			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity)})
+			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity), "price": strconv.Itoa(product.Price), "total": strconv.Itoa(total)})
 
 			_, err = u.productRepo.Update(product)
 			if err != nil {
@@ -297,8 +298,9 @@ func (u *usecase) Create(input transaction.CreateInput) (domains.Transaction, er
 
 			productQuantity := product.Quantity - pq.Quantity
 			product.Quantity = productQuantity
+			total := pq.Quantity * product.Quantity
 
-			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity)})
+			productData = append(productData, map[string]string{"product_id": strconv.Itoa(product.ID), "product_name": product.Name, "quantity": strconv.Itoa(pq.Quantity), "price": strconv.Itoa(product.Price), "total": strconv.Itoa(total)})
 
 			_, err = u.productRepo.Update(product)
 			if err != nil {
