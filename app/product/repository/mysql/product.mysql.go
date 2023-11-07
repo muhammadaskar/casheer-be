@@ -28,13 +28,14 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error) {
 	var products []domains.CustomResult
 
-	if noPagination == true {
+	if noPagination {
 		queryString := "%" + search + "%"
 		query := `SELECT products.id, products.code as code, categories.id as category_id, products.name, categories.name as category, products.price, products.quantity, products.is_deleted, users.name as created_by, products.entry_at, products.created_at
 			FROM products
 			LEFT JOIN users ON products.user_id = users.id
 			LEFT JOIN categories ON products.category_id = categories.id
-			WHERE products.name LIKE ?;`
+			WHERE products.name LIKE ?
+			ORDER BY products.is_deleted DESC;`
 
 		err := r.db.Raw(query, queryString).Scan(&products).Error
 
@@ -49,7 +50,8 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 				FROM products
 				LEFT JOIN users ON products.user_id = users.id
 				LEFT JOIN categories ON products.category_id = categories.id
-					LIMIT ? OFFSET ?;`
+				ORDER BY products.is_deleted DESC
+				LIMIT ? OFFSET ?;`
 
 		err := r.db.Raw(query, perPage, offset).Scan(&products).Error
 
