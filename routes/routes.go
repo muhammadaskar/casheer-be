@@ -26,6 +26,9 @@ import (
 	userDelivery "github.com/muhammadaskar/casheer-be/app/user/delivery/http"
 	userRepo "github.com/muhammadaskar/casheer-be/app/user/repository/mysql"
 	userUseCase "github.com/muhammadaskar/casheer-be/app/user/usecase"
+	userImageDelivery "github.com/muhammadaskar/casheer-be/app/user_image/delivery/http"
+	userImageRepo "github.com/muhammadaskar/casheer-be/app/user_image/repository/mysql"
+	userImageUseCase "github.com/muhammadaskar/casheer-be/app/user_image/usecase"
 	"github.com/muhammadaskar/casheer-be/infrastructures/auth"
 	"github.com/muhammadaskar/casheer-be/infrastructures/mysql_driver"
 )
@@ -42,6 +45,7 @@ func NewRouter() *gin.Engine {
 	memberRepository := memberRepo.NewRepository(db)
 	transactionRepository := transactionRepo.NewRepository(db)
 	storeRepository := storeRepo.NewRepository(db)
+	userImageRepository := userImageRepo.NewRepository(db)
 
 	authentication := auth.NewJWTAuth()
 	userUseCase := userUseCase.NewUseCase(userRepository, notificationRepository)
@@ -52,6 +56,7 @@ func NewRouter() *gin.Engine {
 	memberUseCase := memberUseCase.NewUseCase(memberRepository)
 	transactionUseCase := memberUsecase.NewUseCase(transactionRepository, memberRepository, productRepository, discountRepository)
 	storeUseCase := storeUseCase.NewUseCase(storeRepository)
+	userImageUseCase := userImageUseCase.NewUseCase(userImageRepository)
 
 	userHandler := userDelivery.NewUserHandler(userUseCase, authentication)
 	notificationHandler := notificationDelivery.NewNotificationHandler(notificationUseCase)
@@ -61,6 +66,7 @@ func NewRouter() *gin.Engine {
 	memberHandler := memberDelivery.NewMemberHandler(memberUseCase)
 	transactionHandler := transactionDelivery.NewTransactionHandler(transactionUseCase)
 	storeHandler := storeDelivery.NewStoreHandler(storeUseCase)
+	userImageHandler := userImageDelivery.NewUserImageHandler(userImageUseCase)
 
 	authMiddleware := auth.AuthMiddleware(authentication, userUseCase)
 	authAdminMiddleware := auth.AuthAdminMiddleware(authentication, userUseCase)
@@ -136,6 +142,9 @@ func NewRouter() *gin.Engine {
 		api.GET("/user/total-casheer", authAdminMiddleware, userHandler.GetTotalCasheer)
 		api.PUT("/user/update/name-or-email", authMiddleware, userHandler.UpdateNameOrEmail)
 		api.PUT("/user/update/password", authMiddleware, userHandler.UpdatePassword)
+
+		api.GET("/user/profile-image", authMiddleware, userImageHandler.FindByUserId)
+		api.POST("/user/profile-image", authMiddleware, userImageHandler.CreateOrUpdate)
 
 		api.GET("/store", storeHandler.FindOne)
 		api.POST("/store", authAdminMiddleware, storeHandler.Create)
