@@ -241,3 +241,28 @@ func (h *UserHandler) Reject(c *gin.Context) {
 	response := customresponse.APIResponse("User success to rejected", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *UserHandler) ChangeToAdmin(c *gin.Context) {
+	var inputID user.GetUserIDInput
+	err := c.BindUri(&inputID)
+	if err != nil {
+		errors := customresponse.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := customresponse.APIResponse("Failed to change role", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.userUseCase.ChangeToAdmin(inputID)
+	if err != nil {
+		errors := gin.H{"errors": err.Error()}
+
+		response := customresponse.APIResponse("Failed to change role", http.StatusBadRequest, "error", errors)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("User success to change role", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+}

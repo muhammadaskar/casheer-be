@@ -25,6 +25,7 @@ type UserUseCase interface {
 	Reject(inputID user.GetUserIDInput) (domains.User, error)
 	UpdateNameOrEmail(inputID int, inputData user.NameAndEmailInput) (domains.User, error)
 	UpdatePassword(inputID int, inputData user.PasswordInput) (domains.User, error)
+	ChangeToAdmin(inputID user.GetUserIDInput) (domains.User, error)
 }
 
 type usecase struct {
@@ -275,8 +276,8 @@ func (s *usecase) IsEmailAvailable(email string) (bool, error) {
 	return false, nil
 }
 
-func (s *usecase) IsUsernameAvailable(username string) (bool, error) {
-	user, err := s.userRepository.FindByUsername(username)
+func (u *usecase) IsUsernameAvailable(username string) (bool, error) {
+	user, err := u.userRepository.FindByUsername(username)
 	if err != nil {
 		return false, err
 	}
@@ -288,12 +289,34 @@ func (s *usecase) IsUsernameAvailable(username string) (bool, error) {
 	return false, nil
 }
 
-func (s *usecase) GetUserById(ID int) (domains.User, error) {
-	user, err := s.userRepository.FindById(ID)
+func (u *usecase) GetUserById(ID int) (domains.User, error) {
+	user, err := u.userRepository.FindById(ID)
 	if err != nil {
 		return user, err
 	}
 	return user, nil
+}
+
+func (u *usecase) ChangeToAdmin(inputID user.GetUserIDInput) (domains.User, error) {
+	user, err := u.userRepository.FindById(inputID.ID)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("USER NOT FOUND")
+	}
+
+	if user.Role == 0 {
+		return user, errors.New("CANNOT CHANGE ROLE, BECAUSE THAT USER IS ADMIN")
+	}
+
+	user.Role = 0
+	newAdmin, err := u.userRepository.Update(user)
+	if err != nil {
+		return newAdmin, err
+	}
+	return newAdmin, nil
 }
 
 func checkUsername(username string) bool {
