@@ -58,12 +58,12 @@ pipeline {
             }
         }
 
-        stage('Copy Volume to Asset') {
-            steps {
-                echo 'Copying with Docker Volume'
-                sh 'docker cp dev-casheer-be-container:/asset_user_image /app/asset/image/user'
-            }
-        }
+        // stage('Copy Volume to Asset') {
+        //     steps {
+        //         echo 'Copying with Docker Volume'
+        //         sh 'docker cp dev-casheer-be-container:/asset_user_image /app/asset/image/user'
+        //     }
+        // }
 
     }
     post {
