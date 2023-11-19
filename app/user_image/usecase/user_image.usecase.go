@@ -33,6 +33,10 @@ func (u *usecase) FindByUserId(id int) (domains.UserImage, error) {
 		return userImage, errors.New("DATA NOT FOUND")
 	}
 
+	if userImage.Image == "" {
+		return userImage, errors.New("IMAGE NOT FOUND")
+	}
+
 	image, err := customstorage.GetFileImage("asset/image/user/", userImage.Image)
 	if err != nil {
 		return userImage, err
