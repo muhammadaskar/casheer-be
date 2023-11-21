@@ -53,20 +53,10 @@ pipeline {
         stage('Deploy with Container Run') {
             steps {
                 echo 'Deploying with Docker Container Run...'
-                sh 'docker run -d -p ${SERVER_PORT_DEV}:${SERVER_PORT_DEV} -v dev_asset_user_image:/app/asset/image/user/ --name dev-casheer-be-container dev-casheer-be-image:latest'
+                sh 'docker run -d -p ${SERVER_PORT_DEV}:${SERVER_PORT_DEV} -v dev_asset_image:/app/asset/image/user/ --name dev-casheer-be-container dev-casheer-be-image:latest'
                 echo 'docker ps'
             }
         }
-
-        // stage('Copy Volume to Asset') {
-        //     steps {
-        //         // Give some time for the container to start
-        //         sleep time: 10, unit: 'SECONDS'
-
-        //         echo 'Copying with Docker Volume'
-        //         sh 'docker cp asset_user_image/. dev-casheer-be-container:/asset/image/user/'
-        //     }
-        // }
 
     }
     post {
