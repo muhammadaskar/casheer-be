@@ -60,6 +60,9 @@ pipeline {
 
         stage('Copy Volume to Asset') {
             steps {
+                // Give some time for the container to start
+                sleep time: 10, unit: 'SECONDS'
+                
                 echo 'Copying with Docker Volume'
                 sh 'docker cp asset_user_image/. dev-casheer-be-container:/asset/image/user/'
             }
