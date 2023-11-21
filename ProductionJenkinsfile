@@ -53,7 +53,7 @@ pipeline {
         stage('Deploy with Container Run') {
             steps {
                 echo 'Deploying with Docker Container Run...'
-                sh 'docker run -d -p ${SERVER_PORT}:${SERVER_PORT} --name prod-casheer-be-container prod-casheer-be-image:latest'
+                sh 'docker run -d -p ${SERVER_PORT}:${SERVER_PORT} -v prod_asset_image:/app/asset --name prod-casheer-be-container prod-casheer-be-image:latest'
                 echo 'docker ps'
             }
         }
