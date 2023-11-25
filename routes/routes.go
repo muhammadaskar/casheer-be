@@ -109,6 +109,7 @@ func NewRouter() *gin.Engine {
 		// PRODUCT
 		api.GET("/products", authMiddleware, productHandler.GetAll)
 		api.GET("/product", authMiddleware, productHandler.FindAll)
+		api.GET("/product/deleted", authMiddleware, productHandler.FindAllIsDeleted)
 		api.GET("/product/count", authMiddleware, productHandler.CountProducts)
 		api.GET("/product/:id", authAdminMiddleware, productHandler.FindById)
 		api.POST("/product", authAdminMiddleware, productHandler.CreateProduct)

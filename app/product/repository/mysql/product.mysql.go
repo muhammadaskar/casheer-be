@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error)
+	FindAllIsDeleted(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error)
 	GetAll() ([]domains.CustomProduct, error)
 	Count(is_deleted int) (int64, error)
 	FindById(id int) (domains.CustomResult, error)
@@ -65,6 +66,46 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 	return products, nil
 }
 
+func (r *repository) FindAllIsDeleted(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error) {
+	var products []domains.CustomResult
+
+	if noPagination {
+		queryString := "%" + search + "%"
+		query := `SELECT products.id, products.code as code, categories.id as category_id, products.name, categories.name as category, products.price, products.quantity, products.is_deleted, users.name as created_by, products.entry_at, products.description, products.created_at
+			FROM products
+			LEFT JOIN users ON products.user_id = users.id
+			LEFT JOIN categories ON products.category_id = categories.id
+			WHERE products.name LIKE ?
+			AND products.is_deleted = 0
+			ORDER BY products.is_deleted DESC;`
+
+		err := r.db.Raw(query, queryString).Scan(&products).Error
+
+		if err != nil {
+			return products, err
+		}
+	} else {
+		perPage := limit
+		offset := (page - 1) * perPage
+
+		query := `SELECT products.id, products.code as code, products.name, categories.id as category_id, categories.name as category, products.price, products.quantity, products.is_deleted, users.name as created_by, products.entry_at, products.description, products.created_at
+				FROM products
+				LEFT JOIN users ON products.user_id = users.id
+				LEFT JOIN categories ON products.category_id = categories.id
+				WHERE products.is_deleted = 0
+				LIMIT ? OFFSET ?;`
+
+		err := r.db.Raw(query, perPage, offset).Scan(&products).Error
+
+		if err != nil {
+			return products, err
+		}
+
+		return products, nil
+	}
+	return products, nil
+}
+
 func (r *repository) GetAll() ([]domains.CustomProduct, error) {
 	var products []domains.CustomProduct
 
@@ -84,7 +125,7 @@ func (r *repository) Count(is_deleted int) (int64, error) {
 	var count int64
 	var err error
 
-	if is_deleted == 3 {
+	if is_deleted == 2 {
 		err = r.db.Model(&products).Count(&count).Error
 	} else {
 		err = r.db.Where("is_deleted = ?", is_deleted).Model(&products).Count(&count).Error
