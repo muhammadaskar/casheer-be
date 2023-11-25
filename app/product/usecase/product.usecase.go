@@ -77,7 +77,7 @@ func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.Custom
 
 func (u *usecase) FindAllIsDeleted(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error) {
 	if query.Query != "" {
-		products, err := u.productRepository.FindAll(query.Query, query.Page, query.Limit, true)
+		products, err := u.productRepository.FindAllIsDeleted(query.Query, query.Page, query.Limit, true)
 		if err != nil {
 			return products, true, err
 		}
@@ -89,7 +89,7 @@ func (u *usecase) FindAllIsDeleted(query product.GetProductsQueryInput) ([]domai
 
 		return products, true, nil
 	} else {
-		products, err := u.productRepository.FindAll(query.Query, query.Page, query.Limit, false)
+		products, err := u.productRepository.FindAllIsDeleted(query.Query, query.Page, query.Limit, false)
 		if err != nil {
 			return products, true, err
 		}
