@@ -14,7 +14,7 @@ import (
 type ProductUseCase interface {
 	FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error)
 	GetAll() ([]domains.CustomProduct, error)
-	CountAll() (int64, error)
+	CountAll(is_deleted int) (int64, error)
 	FindById(input product.GetProductDetailInput) (domains.CustomResult, error)
 	Create(input product.CreateInput) (domains.Product, error)
 	Update(inputID product.GetProductDetailInput, inputData product.CreateInput) (domains.Product, error)
@@ -55,7 +55,7 @@ func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.Custom
 			return products, true, err
 		}
 
-		totalCount, err := u.CountAll()
+		totalCount, err := u.CountAll(1)
 		if err != nil {
 			return products, true, err
 		}
@@ -115,8 +115,8 @@ func (u *usecase) GetAll() ([]domains.CustomProduct, error) {
 	return products, nil
 }
 
-func (u *usecase) CountAll() (int64, error) {
-	count, err := u.productRepository.Count()
+func (u *usecase) CountAll(is_deleted int) (int64, error) {
+	count, err := u.productRepository.Count(is_deleted)
 	if err != nil {
 		return count, err
 	}

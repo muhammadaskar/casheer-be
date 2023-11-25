@@ -8,7 +8,7 @@ import (
 type Repository interface {
 	FindAll(search string, page int, limit int, noPagination bool) ([]domains.CustomResult, error)
 	GetAll() ([]domains.CustomProduct, error)
-	Count() (int64, error)
+	Count(is_deleted int) (int64, error)
 	FindById(id int) (domains.CustomResult, error)
 	FindByProductID(id int) (domains.Product, error)
 	FindByProductCode(id string) (domains.Product, error)
@@ -79,11 +79,17 @@ func (r *repository) GetAll() ([]domains.CustomProduct, error) {
 	return products, nil
 }
 
-func (r *repository) Count() (int64, error) {
+func (r *repository) Count(is_deleted int) (int64, error) {
 	var products []domains.Product
 	var count int64
+	var err error
 
-	err := r.db.Model(&products).Count(&count).Error
+	if is_deleted == 3 {
+		err = r.db.Model(&products).Count(&count).Error
+	} else {
+		err = r.db.Where("is_deleted = ?", is_deleted).Model(&products).Count(&count).Error
+	}
+
 	if err != nil {
 		return count, err
 	}

@@ -64,7 +64,7 @@ func (h *ProductHandler) GetAll(c *gin.Context) {
 }
 
 func (h *ProductHandler) CountProducts(c *gin.Context) {
-	count, err := h.productUseCase.CountAll()
+	count, err := h.productUseCase.CountAll(3)
 	if err != nil {
 		response := customresponse.APIResponse("Error to get count products", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
