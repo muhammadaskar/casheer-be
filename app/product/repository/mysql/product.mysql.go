@@ -35,6 +35,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 			LEFT JOIN users ON products.user_id = users.id
 			LEFT JOIN categories ON products.category_id = categories.id
 			WHERE products.name LIKE ?
+			AND products.is_deleted = 1
 			ORDER BY products.is_deleted DESC;`
 
 		err := r.db.Raw(query, queryString).Scan(&products).Error
@@ -50,7 +51,7 @@ func (r *repository) FindAll(search string, page int, limit int, noPagination bo
 				FROM products
 				LEFT JOIN users ON products.user_id = users.id
 				LEFT JOIN categories ON products.category_id = categories.id
-				ORDER BY products.is_deleted DESC
+				WHERE products.is_deleted = 1
 				LIMIT ? OFFSET ?;`
 
 		err := r.db.Raw(query, perPage, offset).Scan(&products).Error
