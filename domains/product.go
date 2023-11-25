@@ -26,23 +26,25 @@ type Product struct {
 }
 
 type CustomResult struct {
-	ID         uint      `json:"id"`
-	Code       string    `json:"code"`
-	CategoryID int       `json:"category_id"`
-	Name       string    `json:"name"`
-	Category   string    `json:"category"`
-	Price      float64   `json:"price"`
-	Quantity   int       `json:"quantity"`
-	IsDeleted  int       `json:"is_deleted"`
-	CreatedBy  string    `json:"created_by"`
-	EntryAt    time.Time `json:"entry_at"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID          uint      `json:"id"`
+	Code        string    `json:"code"`
+	CategoryID  int       `json:"category_id"`
+	Name        string    `json:"name"`
+	Category    string    `json:"category"`
+	Price       float64   `json:"price"`
+	Quantity    int       `json:"quantity"`
+	IsDeleted   int       `json:"is_deleted"`
+	Description string    `json:"description"`
+	CreatedBy   string    `json:"created_by"`
+	EntryAt     time.Time `json:"entry_at"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type CustomProduct struct {
-	ID       uint    `json:"id"`
-	Code     string  `json:"code"`
-	Name     string  `json:"name"`
-	Price    float64 `json:"price"`
-	Quantity int     `json:"quantity"`
+	ID          uint    `json:"id"`
+	Code        string  `json:"code"`
+	Name        string  `json:"name"`
+	Price       float64 `json:"price"`
+	Quantity    int     `json:"quantity"`
+	Description string  `json:"description"`
 }
