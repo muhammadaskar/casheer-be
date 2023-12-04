@@ -144,6 +144,18 @@ func (h *UserHandler) UpdatePassword(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *UserHandler) GetUserAdmin(c *gin.Context) {
+	casheers, err := h.userUseCase.GetUserAdmin()
+	if err != nil {
+		response := customresponse.APIResponse("Failed to get users", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := customresponse.APIResponse("Success to get users", http.StatusOK, "success", casheers)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *UserHandler) GetUserCasheers(c *gin.Context) {
 	casheers, err := h.userUseCase.GetUserCasheers()
 	if err != nil {

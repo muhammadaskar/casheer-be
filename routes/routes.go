@@ -136,6 +136,7 @@ func NewRouter() *gin.Engine {
 		api.POST("/transaction", authMiddleware, transactionHandler.CreateTransaction)
 
 		api.GET("/users", authAdminMiddleware, userHandler.GetUserCasheers)
+		api.GET("/users/admin", authAdminMiddleware, userHandler.GetUserAdmin)
 		api.PUT("/users/change-to-admin/:id", authAdminMiddleware, userHandler.ChangeToAdmin)
 		api.GET("/users/unprocess", authAdminMiddleware, userHandler.GetUsersUnprocess)
 		api.GET("/users/rejected", authAdminMiddleware, userHandler.GetUsersRejected)
