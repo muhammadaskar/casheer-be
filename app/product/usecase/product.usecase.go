@@ -13,8 +13,9 @@ import (
 
 type ProductUseCase interface {
 	FindAll(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error)
+	FindAllIsDeleted(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error)
 	GetAll() ([]domains.CustomProduct, error)
-	CountAll() (int64, error)
+	CountAll(is_deleted int) (int64, error)
 	FindById(input product.GetProductDetailInput) (domains.CustomResult, error)
 	Create(input product.CreateInput) (domains.Product, error)
 	Update(inputID product.GetProductDetailInput, inputData product.CreateInput) (domains.Product, error)
@@ -55,7 +56,50 @@ func (u *usecase) FindAll(query product.GetProductsQueryInput) ([]domains.Custom
 			return products, true, err
 		}
 
-		totalCount, err := u.CountAll()
+		totalCount, err := u.CountAll(1)
+		if err != nil {
+			return products, true, err
+		}
+
+		perPage := query.Limit
+		offset := (query.Page - 1) * perPage
+		totalPages := int(math.Ceil(float64(totalCount) / float64(perPage)))
+
+		// Hitung nomor halaman saat ini berdasarkan offset dan produk per halaman
+		currentPage := (offset / perPage) + 1
+
+		// Periksa apakah Anda berada di halaman terakhir
+		isLastPage := currentPage == totalPages
+
+		return products, isLastPage, nil
+	}
+}
+
+func (u *usecase) FindAllIsDeleted(query product.GetProductsQueryInput) ([]domains.CustomResult, bool, error) {
+	if query.Query != "" {
+		products, err := u.productRepository.FindAllIsDeleted(query.Query, query.Page, query.Limit, true)
+		if err != nil {
+			return products, true, err
+		}
+
+		_, err = u.setNotification(products)
+		if err != nil {
+			return products, true, err
+		}
+
+		return products, true, nil
+	} else {
+		products, err := u.productRepository.FindAllIsDeleted(query.Query, query.Page, query.Limit, false)
+		if err != nil {
+			return products, true, err
+		}
+
+		_, err = u.setNotification(products)
+		if err != nil {
+			return products, true, err
+		}
+
+		totalCount, err := u.CountAll(0)
 		if err != nil {
 			return products, true, err
 		}
@@ -115,8 +159,8 @@ func (u *usecase) GetAll() ([]domains.CustomProduct, error) {
 	return products, nil
 }
 
-func (u *usecase) CountAll() (int64, error) {
-	count, err := u.productRepository.Count()
+func (u *usecase) CountAll(is_deleted int) (int64, error) {
+	count, err := u.productRepository.Count(is_deleted)
 	if err != nil {
 		return count, err
 	}

@@ -109,6 +109,7 @@ func NewRouter() *gin.Engine {
 		// PRODUCT
 		api.GET("/products", authMiddleware, productHandler.GetAll)
 		api.GET("/product", authMiddleware, productHandler.FindAll)
+		api.GET("/product/deleted", authMiddleware, productHandler.FindAllIsDeleted)
 		api.GET("/product/count", authMiddleware, productHandler.CountProducts)
 		api.GET("/product/:id", authAdminMiddleware, productHandler.FindById)
 		api.POST("/product", authAdminMiddleware, productHandler.CreateProduct)
@@ -135,6 +136,7 @@ func NewRouter() *gin.Engine {
 		api.POST("/transaction", authMiddleware, transactionHandler.CreateTransaction)
 
 		api.GET("/users", authAdminMiddleware, userHandler.GetUserCasheers)
+		api.GET("/users/admin", authAdminMiddleware, userHandler.GetUserAdmin)
 		api.PUT("/users/change-to-admin/:id", authAdminMiddleware, userHandler.ChangeToAdmin)
 		api.GET("/users/unprocess", authAdminMiddleware, userHandler.GetUsersUnprocess)
 		api.GET("/users/rejected", authAdminMiddleware, userHandler.GetUsersRejected)

@@ -43,6 +43,31 @@ func (h *ProductHandler) FindAll(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *ProductHandler) FindAllIsDeleted(c *gin.Context) {
+	var query product.GetProductsQueryInput
+	err := c.ShouldBindQuery(&query)
+	if err != nil {
+		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, isLastPage, err := h.productUseCase.FindAllIsDeleted(query)
+	if err != nil {
+		response := customresponse.APIResponse("Error to get products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{
+		"is_last_page": isLastPage,
+		"products":     products,
+	}
+
+	response := customresponse.APIResponse("List of products", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *ProductHandler) GetAll(c *gin.Context) {
 	var query product.GetProductsQueryInput
 	err := c.ShouldBindQuery(&query)
@@ -64,7 +89,7 @@ func (h *ProductHandler) GetAll(c *gin.Context) {
 }
 
 func (h *ProductHandler) CountProducts(c *gin.Context) {
-	count, err := h.productUseCase.CountAll()
+	count, err := h.productUseCase.CountAll(2)
 	if err != nil {
 		response := customresponse.APIResponse("Error to get count products", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
